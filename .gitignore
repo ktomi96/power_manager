@@ -136,3 +136,6 @@ dmypy.json
 
 #ods files
 *.ods
+
+#csv logs
+*.csv
