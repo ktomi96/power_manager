@@ -8,11 +8,11 @@ class AC_login_setup(FlaskForm):
         "IP address of the ac", validators=[InputRequired()])
     TOKEN = StringField(
         "Token from ac app/lib", validators=[InputRequired()])
-    KEY = IntegerField(
+    KEY = StringField(
         "Key from ac app/lib", validators=[InputRequired()])
-    LOCATION_ID = IntegerField(
+    LOCATION_ID = StringField(
         "Site location id", validators=[InputRequired()])
-    SOLAR_API_KEY = IntegerField(
-        "Solar site API key", validators=[InputRequired()])        
+    SOLAR_API_KEY = StringField(
+        "Solar site API key", validators=[InputRequired()])
 
     submit = SubmitField("Submit")

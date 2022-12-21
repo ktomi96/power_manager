@@ -39,14 +39,14 @@ def solar_plot(df):
 
     return json.dumps(fig, cls=utils.PlotlyJSONEncoder)
 
+
 def graph_plotter(range_to_plot: str):
     if range_to_plot == "all":
-        ac_df = merge_csv("logs/ac", '/*_ac_log.csv')
-        solar_df = merge_csv("logs/solar", '/*_solar_log.csv')
+        ac_df = merge_csv("./logs/ac", '/*_ac_log.csv')
+        solar_df = merge_csv("./logs/solar", '/*_solar_log.csv')
         ac_fig = ac_plot(ac_df)
         solar_fig = solar_plot(solar_df)
         return [ac_fig, solar_fig]
-
 
 
 def merge_csv(folder, filename):
@@ -54,14 +54,16 @@ def merge_csv(folder, filename):
     df_list = (pd.read_csv(file) for file in csv_files)
     return pd.concat(df_list, ignore_index=True)
 
+
 if __name__ == '__main__':
-    path = "logs/ac"
+    path = "./logs/ac"
     csv_files = glob.glob(f"{path}/*_ac_log.csv")
     df_list = (pd.read_csv(file) for file in csv_files)
     # df = pd.concat(df_list, ignore_index=True)
     # ac_plot(df)
-    path = "logs/solar"
+    path = "./logs/solar"
     csv_files = glob.glob(f"{path}/*_solar_log.csv")
     df_list = (pd.read_csv(file) for file in csv_files)
     df = pd.concat(df_list, ignore_index=True)
-    solar_plot(df)
+    fig_graph = solar_plot(df)
+    print(fig_graph)

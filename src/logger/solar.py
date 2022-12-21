@@ -30,7 +30,8 @@ def get_data(location_id, solar_api_key):
     return (number_of_sites['energy'])['values']
 
 
-def filter_data(location_id, solar_api_key):  # sourcery skip: for-append-to-extend, list-comprehension
+# sourcery skip: for-append-to-extend, list-comprehension
+def filter_data(location_id, solar_api_key):
     filterd = get_data(location_id, solar_api_key)
     new_list = []
     num_prod_time = 96
@@ -84,12 +85,12 @@ def solar_logging(csv_path: str, location_id: str, solar_api_key: str):
 
 if __name__ == '__main__':
     import dotenv
-    dotenv.load_dotenv(".env")
+    dotenv.load_dotenv("./env/.env")
     location_id = os.getenv("LOCATION_ID")
     solar_api_key = os.getenv("SOLAR_API_KEY")
 
     scheduler = BackgroundScheduler()
-    scheduler.add_job(func=solar_data,trigger='cron', hour=11, minute=13)
+    scheduler.add_job(func=solar_data, trigger='cron', hour=17, minute=49)
     scheduler.start()
     try:
         # This is here to simulate application activity (which keeps the main thread alive).

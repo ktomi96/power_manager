@@ -12,7 +12,7 @@ from forms import AC_login_setup
 from plotter import graph_plotter
 
 
-dotenv_path = ".env"
+dotenv_path = "./env/.env"
 
 app = Flask(__name__, template_folder="templates/")
 

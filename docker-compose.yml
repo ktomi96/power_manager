@@ -1,0 +1,15 @@
+version: "3"
+services:
+  logger:
+    build:
+      dockerfile: ./Dockerfile.logger
+    volumes:
+      - ./env:/app/env
+      - ./logs:/app/logs
+
+  webserver:
+    build:
+      dockerfile: ./Dockerfile.webserver
+    volumes:
+      - ./env:/app/env
+      - ./logs:/app/logs

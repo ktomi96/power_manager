@@ -16,13 +16,15 @@ try:
 except ImportError:
     import trollius as asyncio
 
-dotenv.load_dotenv(".env")
+env_path = ("./env/.env")
+dotenv.find_dotenv(filename=env_path, raise_error_if_not_found=True)
+dotenv.load_dotenv(env_path)
 address = os.getenv("ADDRESS")
 token = os.getenv("TOKEN")
 key = os.getenv("KEY")
 location_id = os.getenv("LOCATION_ID")
 solar_api_key = os.getenv("SOLAR_API_KEY")
-csv_path = "logs/"
+csv_path = "./logs/"
 
 
 def tick():

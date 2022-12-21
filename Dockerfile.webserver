@@ -6,5 +6,7 @@ WORKDIR /app
 COPY pyproject.toml poetry.lock ./
 RUN POETRY_VIRTUALENVS_CREATE=false poetry install
 COPY ./src/webserver /app/src/webserver
-EXPOSE 5500
-ENTRYPOINT ["python", "/app/src/webserver/main.py"]
+EXPOSE 5000
+ENV FLASK_APP=/app/src/webserver/main.py
+ENTRYPOINT [ "flask"]
+CMD [ "run", "--host", "0.0.0.0" ]
