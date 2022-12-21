@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <div class="row p-4">
+      <div class="card m-auto" style="width: 90%;" data-aos="fade-left">
+          <div class="card-body">
+            <h1>Solar and ac data</h1>
+              <div id="chart1"></div>
+              <div id="chart2"></div>
+          </div>
+          </div>
+      </div>
+
+      
+      </div>
+  </div>
+  <!-- plotly CDN -->
+
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script type="text/javascript">
+      var graph1 = {{ figs[0] | safe}};
+      Plotly.plot("chart1", graph1,{});
+      var graph2 = {{ figs[1] | safe}};
+      Plotly.plot("chart2", graph2,{});
+  </script>
+  </body>
+</html>

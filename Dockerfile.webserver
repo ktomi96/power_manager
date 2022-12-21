@@ -1,0 +1,10 @@
+FROM python:3-slim as python
+ENV PYTHONUNBUFFERED=true
+RUN pip install poetry
+
+WORKDIR /app
+COPY pyproject.toml poetry.lock ./
+RUN POETRY_VIRTUALENVS_CREATE=false poetry install
+COPY ./src/webserver /app/src/webserver
+EXPOSE 5500
+ENTRYPOINT ["python", "/app/src/webserver/main.py"]
