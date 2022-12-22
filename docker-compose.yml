@@ -6,6 +6,7 @@ services:
     volumes:
       - ./env:/app/env
       - ./logs:/app/logs
+    restart: always
 
   webserver:
     build:

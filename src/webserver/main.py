@@ -13,6 +13,8 @@ from plotter import graph_plotter
 
 
 dotenv_path = "./env/.env"
+logs_dir = ["ac", "solar"]
+logs_path = "./logs/"
 
 app = Flask(__name__, template_folder="templates/")
 
@@ -44,8 +46,13 @@ def home():
     if not is_config():
         return redirect(url_for("setup_page"))
 
-    figs = graph_plotter("all")
-    return render_template("home.html", figs=figs)
+    if os.listdir(logs_path+logs_dir[0]) and os.listdir(logs_path+logs_dir[1]):
+        #  TODO probably needs caching no to render in every refresh
+        figs = graph_plotter("all")
+        return render_template("home.html", figs=figs)
+
+    else:
+        return "No logs yet"
 
 
 @app.route("/setup", methods=["GET", "POST"])
