@@ -46,9 +46,7 @@ def filter_data(location_id, solar_api_key):
             foo[1] = int(foo[1])
         new_list.append(foo)
 
-    y = []
-    for n in new_list:
-        y.append(n[1])
+    y = [n[1] for n in new_list]
     return y, num_prod_time
 
 
@@ -73,6 +71,7 @@ def solar_logging(csv_path: str, location_id: str, solar_api_key: str):
     data = solar_data(location_id, solar_api_key)
     today = datetime.now()
     datem = date(today.year, today.month, 1)
+    print(datem)
     df = pd.DataFrame([data])
     file_path = f"{csv_path}"+f"solar/{datem}_solar_log.csv"
 
@@ -88,9 +87,11 @@ if __name__ == '__main__':
     dotenv.load_dotenv("./env/.env")
     location_id = os.getenv("LOCATION_ID")
     solar_api_key = os.getenv("SOLAR_API_KEY")
+    csv_path = "./logs/"
 
     scheduler = BackgroundScheduler()
-    scheduler.add_job(func=solar_data, trigger='cron', hour=17, minute=49)
+    scheduler.add_job(solar_logging, args=[
+                      csv_path, location_id, solar_api_key], trigger='cron', hour=13, minute=29)
     scheduler.start()
     try:
         # This is here to simulate application activity (which keeps the main thread alive).

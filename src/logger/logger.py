@@ -34,9 +34,9 @@ def tick():
 if __name__ == '__main__':
     scheduler = AsyncIOScheduler()
     scheduler.add_job(ac_logging, args=[address, token, key,
-                      csv_path], trigger='interval', minutes=5)
+                      csv_path], trigger='interval', minutes=1)
     scheduler.add_job(solar_logging, args=[
-                      csv_path, location_id, solar_api_key], trigger='cron', hour=1, minute=1)
+                      csv_path, location_id, solar_api_key], trigger='cron', hour=13, minute=4)
     scheduler.start()
     print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
 

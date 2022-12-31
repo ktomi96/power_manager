@@ -3,22 +3,21 @@ from datetime import datetime
 from datetime import date
 import pandas as pd
 import os
+from pprint import pprint
 
 
-def ac_status(address: str, token: str, key: str):
-    status = appliance_state(address=address, token=token, key=key)
-    # workaround where outdoor temp near 0˚C doesnt get rounded in the midea_beatufil libery
-    if status.state.outdoor_temperature == 2.2250738585072014e-308:
-        out_temp = 0
-    else:
-        out_temp = status.state.outdoor_temperature
-
-    return {"running": status.state.running, "indoor_temperature": status.state.indoor_temperature,
-            "out_door_temperature": out_temp}
+def get_status(address: str, token: str, key: str):
+    return appliance_state(address=address, token=token, key=key)
 
 
-def ac_logging(address: str, token: str, key: str, csv_path: str):
-    status = ac_status(address, token, key)
+def ac_status(status):
+
+    return {"running": status.state.running, "indoor_temperature": round(status.state.indoor_temperature, 1),
+            "out_door_temperature": round(status.state.outdoor_temperature, 1)}
+
+
+def ac_logging(address, token, key, csv_path: str):
+    status = ac_status(get_status(address, token, key))
     now = datetime.now()
     status.update({"date_time": datetime.now().__str__()})
     print(status)
@@ -33,3 +32,25 @@ def save_to_csv(status, csv_path: str):
 
     else:
         df.to_csv(file_path, mode="w", index=False, header=True)
+
+
+def set_ac_status(*args, status):
+    # status.set_state()
+    for arg in args:
+        print(arg)
+
+
+if __name__ == '__main__':
+    import dotenv
+
+    env_path = ("./env/.env")
+
+    dotenv.find_dotenv(filename=env_path, raise_error_if_not_found=True)
+    dotenv.load_dotenv(env_path)
+
+    address = os.getenv("ADDRESS")
+    token = os.getenv("TOKEN")
+    key = os.getenv("KEY")
+    csv_path = "./logs/"
+    # status = ac_status(address, token, key)
+    pprint(ac_logging(address, token, key, csv_path))
