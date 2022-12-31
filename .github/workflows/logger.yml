@@ -20,15 +20,14 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Docker Setup QEMU
         uses: docker/setup-qemu-action@v2.1.0
-  
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
-          context: ./Dockerfile.logger
+          file: ./Dockerfile.logger
           platforms: linux/arm64
           push: true
           tags: |

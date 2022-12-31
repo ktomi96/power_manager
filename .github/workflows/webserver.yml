@@ -27,7 +27,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
-          context: ./Dockerfile.webserver
+          file: ./Dockerfile.webserver
           platforms: linux/arm64
           push: true
           tags: |
