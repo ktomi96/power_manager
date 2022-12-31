@@ -1,0 +1,34 @@
+name: Publish Docker image
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: ["*"]
+
+jobs:
+  publish-docker-image:
+    name: Publish Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker Setup QEMU
+        uses: docker/setup-qemu-action@v2.1.0
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./Dockerfile.webserver
+          platforms: linux/arm64
+          push: true
+          tags: |
+            ghcr.io/ktomi96/vacation_manager/webserver:latest
