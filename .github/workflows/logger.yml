@@ -31,4 +31,4 @@ jobs:
           platforms: linux/arm64
           push: true
           tags: |
-            ghcr.io/ktomi96/vacation_manager/logger:latest
+            ghcr.io/ktomi96/power_manager/logger:latest
