@@ -7,6 +7,7 @@ import plotly.express as px
 from plotly import utils
 import json
 from functools import lru_cache
+from dateutil.parser import parse
 
 
 def ac_plot(df):
@@ -29,7 +30,7 @@ def ac_plot(df):
 
 def solar_plot(df):
     pio.templates.default = "plotly_white"
-    df = df.set_index('date')
+    df = df.set_index('date_time')
     cols = df.columns[:2]
     ncols = len(cols)
     fig = make_subplots(rows=ncols, cols=1, shared_xaxes=True)
@@ -50,11 +51,30 @@ def graph_plotter(range_to_plot: str):
         solar_fig = solar_plot(solar_df)
         return [ac_fig, solar_fig]
 
+    elif date_time_validator(range_to_plot) == True:
+        ac_df = merge_csv("./logs/ac", f'/{range_to_plot}_ac_log.csv')
+        solar_df = merge_csv("./logs/solar", '/*_solar_log.csv')
+        ac_fig = ac_plot(ac_df)
+        solar_fig = solar_plot(solar_df)
+        return [ac_fig, solar_fig]
+
 
 def merge_csv(folder, filename):
     csv_files = glob.glob(f"{folder}{filename}")
     df_list = (pd.read_csv(file) for file in csv_files)
-    return pd.concat(df_list, ignore_index=True)
+    df = pd.concat(df_list, ignore_index=False, sort=True)
+    # df['date_time'] = pd.to_datetime(df['date_time'])
+    df.sort_values(by='date_time', inplace=True)
+    return df
+
+
+def date_time_validator(date: str):
+    try:
+        parse(date, fuzzy=False)
+        return True
+
+    except ValueError:
+        return False
 
 
 if __name__ == '__main__':
@@ -63,9 +83,6 @@ if __name__ == '__main__':
     df_list = (pd.read_csv(file) for file in csv_files)
     # df = pd.concat(df_list, ignore_index=True)
     # ac_plot(df)
-    path = "./logs/solar"
-    csv_files = glob.glob(f"{path}/*_solar_log.csv")
-    df_list = (pd.read_csv(file) for file in csv_files)
-    df = pd.concat(df_list, ignore_index=True)
-    fig_graph = solar_plot(df)
-    print(fig_graph)
+    # path = "./logs/solar"
+    df = merge_csv('./logs/ac', '/*_ac_log.csv')
+    print(df)

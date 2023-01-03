@@ -26,17 +26,12 @@ location_id = os.getenv("LOCATION_ID")
 solar_api_key = os.getenv("SOLAR_API_KEY")
 csv_path = "./logs/"
 
-
-def tick():
-    print(f'Tick! The time is: {datetime.now()}')
-
-
 if __name__ == '__main__':
     scheduler = AsyncIOScheduler()
     scheduler.add_job(ac_logging, args=[address, token, key,
                       csv_path], trigger='interval', minutes=1)
     scheduler.add_job(solar_logging, args=[
-                      csv_path, location_id, solar_api_key], trigger='cron', hour=13, minute=4)
+                      csv_path, location_id, solar_api_key], trigger='cron', hour=23, minute=00)
     scheduler.start()
     print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
 

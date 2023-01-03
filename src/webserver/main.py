@@ -10,6 +10,7 @@ import pandas as pd
 
 from forms import AC_login_setup
 from plotter import graph_plotter
+from datetime import date
 
 
 dotenv_path = "./env/.env"
@@ -48,7 +49,7 @@ def home():
 
     if os.listdir(logs_path+logs_dir[0]) and os.listdir(logs_path+logs_dir[1]):
         #  TODO probably needs caching no to render in every refresh
-        figs = graph_plotter("all")
+        figs = graph_plotter(date.today().strftime('%Y-%m-%d'))
         return render_template("home.html", figs=figs)
 
     else:
