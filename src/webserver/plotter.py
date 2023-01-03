@@ -6,8 +6,8 @@ from plotly.subplots import make_subplots
 import plotly.express as px
 from plotly import utils
 import json
-from functools import lru_cache
 from dateutil.parser import parse
+from memoization import cached
 
 
 def ac_plot(df):
@@ -42,7 +42,7 @@ def solar_plot(df):
     return json.dumps(fig, cls=utils.PlotlyJSONEncoder)
 
 
-@lru_cache(maxsize=1)
+@cached(ttl=60)
 def graph_plotter(range_to_plot: str):
     if range_to_plot == "all":
         ac_df = merge_csv("./logs/ac", '/*_ac_log.csv')

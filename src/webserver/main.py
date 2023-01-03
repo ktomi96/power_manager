@@ -13,6 +13,7 @@ from plotter import graph_plotter
 from datetime import date
 
 
+
 dotenv_path = "./env/.env"
 logs_dir = ["ac", "solar"]
 logs_path = "./logs/"

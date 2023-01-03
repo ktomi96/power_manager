@@ -25,6 +25,7 @@ def get_daytime():
 def get_data(location_id, solar_api_key):
     se_client = Client()
     se_client.set_api_key(solar_api_key)
+
     today_str = date.today().strftime('%Y-%m-%d')
     number_of_sites = se_client.sites.get_energy(
         location_id, today_str, today_str, 'QUARTER_OF_AN_HOUR')

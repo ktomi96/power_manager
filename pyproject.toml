@@ -18,6 +18,7 @@ apscheduler = "^3.9.1.post1"
 pandas = "^1.5.2"
 py-solaredge = "^0.0.4.9"
 plotly = "^5.11.0"
+memoization = "^0.4.0"
 
 
 [build-system]
