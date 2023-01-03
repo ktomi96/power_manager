@@ -26,7 +26,7 @@ csv_path = "./logs/"
 if __name__ == '__main__':
     scheduler = BlockingScheduler()
     scheduler.add_job(ac_logging, args=[address, token, key,
-                      csv_path], trigger='interval', seconds=5)
+                      csv_path], trigger='interval', minutes=1)
     scheduler.add_job(solar_logging, args=[
                       csv_path, location_id, solar_api_key], trigger='cron', hour=23, minute=00)
     print('Press Ctrl+C to exit')
