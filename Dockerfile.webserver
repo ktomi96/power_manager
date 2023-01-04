@@ -1,4 +1,6 @@
 FROM python:3-slim as python
+RUN apt-get update &&\
+   apt-get install -y curl
 ENV PYTHONUNBUFFERED=true
 RUN pip install poetry
 
@@ -10,3 +12,4 @@ EXPOSE 5000
 ENV FLASK_APP=/app/src/webserver/main.py
 ENTRYPOINT [ "flask"]
 CMD [ "run", "--host", "0.0.0.0" ]
+HEALTHCHECK --interval=5m --retries=2 CMD curl --fail http://localhost:5000/ping || exit 1

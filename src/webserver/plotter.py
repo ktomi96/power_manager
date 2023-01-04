@@ -31,7 +31,7 @@ def ac_plot(df):
 def solar_plot(df):
     pio.templates.default = "plotly_white"
     df = df.set_index('date_time')
-    cols = df.columns[:2]
+    cols = df.columns[2:]
     ncols = len(cols)
     fig = make_subplots(rows=ncols, cols=1, shared_xaxes=True)
 
@@ -84,5 +84,4 @@ if __name__ == '__main__':
     # df = pd.concat(df_list, ignore_index=True)
     # ac_plot(df)
     # path = "./logs/solar"
-    df = merge_csv('./logs/ac', '/*_ac_log.csv')
-    print(df)
+    df = graph_plotter("all")

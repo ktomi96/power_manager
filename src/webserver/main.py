@@ -3,7 +3,7 @@ import os
 import requests
 import glob
 
-from flask import Flask, redirect, request, url_for, render_template, escape, flash, session
+from flask import Flask, redirect, request, url_for, render_template, escape, flash, session, jsonify
 from livereload import Server, shell
 import dotenv
 import pandas as pd
@@ -11,7 +11,6 @@ import pandas as pd
 from forms import AC_login_setup
 from plotter import graph_plotter
 from datetime import date
-
 
 
 dotenv_path = "./env/.env"
@@ -47,10 +46,10 @@ def set_dotenv_ac(request):
 def home():
     if not is_config():
         return redirect(url_for("setup_page"))
+    today = date.today().strftime('%Y-%m-%d')
 
-    if os.listdir(logs_path+logs_dir[0]) and os.listdir(logs_path+logs_dir[1]):
-        #  TODO probably needs caching no to render in every refresh
-        figs = graph_plotter(date.today().strftime('%Y-%m-%d'))
+    if os.path.exists(logs_path+logs_dir[0]+f"/{today}_ac_log.csv") and os.listdir(logs_path+logs_dir[1]):
+        figs = graph_plotter(today)
         return render_template("home.html", figs=figs)
 
     else:
@@ -70,6 +69,15 @@ def setup_page():
         return redirect(url_for("home"))
 
     return render_template("setup.html", form=ac_form)
+
+
+@app.route("/ping", methods=["GET"])
+def is_webserver_running():
+    if not is_config():
+        return redirect(url_for("setup_page"))
+
+    response = {"is_webserver_running": True}
+    return jsonify(response)
 
 
 init_dotenv()
