@@ -3,7 +3,6 @@ from datetime import datetime
 from datetime import date
 import pandas as pd
 import os
-from pprint import pprint
 
 
 def get_status(address: str, token: str, key: str):
@@ -42,6 +41,7 @@ def set_ac_status(*args, status):
 
 if __name__ == '__main__':
     import dotenv
+    from pprint import pprint
 
     env_path = ("./env/.env")
 
