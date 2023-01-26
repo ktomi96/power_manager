@@ -9,7 +9,7 @@ COPY pyproject.toml poetry.lock ./
 RUN POETRY_VIRTUALENVS_CREATE=false poetry install
 COPY ./src/webserver /app/src/webserver
 EXPOSE 5000
-ENV FLASK_APP=/app/src/webserver/main.py
+ENV FLASK_APP=/app/src/webserver/webserver.py
 ENTRYPOINT [ "flask"]
 CMD [ "run", "--host", "0.0.0.0" ]
 HEALTHCHECK --interval=5m --retries=2 CMD curl --fail http://localhost:5000/ping || exit 1

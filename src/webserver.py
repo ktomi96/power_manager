@@ -9,7 +9,7 @@ import dotenv
 import pandas as pd
 
 from forms import AC_login_setup
-from plotter import graph_plotter
+from plotter import ac_plotter, solar_plotter
 from datetime import date
 
 
@@ -48,12 +48,10 @@ def home():
         return redirect(url_for("setup_page"))
     today = date.today().strftime('%Y-%m-%d')
 
-    if os.path.exists(logs_path+logs_dir[0]+f"/{today}_ac_log.csv") and os.listdir(logs_path+logs_dir[1]):
-        figs = graph_plotter(today)
-        return render_template("home.html", figs=figs)
+    ac_fig = ac_plotter(today)
+    solar_fig = solar_plotter()
 
-    else:
-        return "No logs yet"
+    return render_template("home.html", ac_fig=ac_fig, solar_fig=solar_fig)
 
 
 @app.route("/setup", methods=["GET", "POST"])
@@ -85,4 +83,4 @@ if __name__ == "__main__":
 
     server = Server(app.wsgi_app)
     server.watch(dotenv_path)
-    server.serve(host="localhost", port=5500)
+    server.serve(host="localhost", port=5000)

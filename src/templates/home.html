@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Power manager</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  </head>
+  <body>
+    <div class="row p-4">
+      <div class="card m-auto" style="width: 90%;" data-aos="fade-left">
+          <div class="card-body">
+            <h1>Solar and ac data</h1>
+{% if ac_fig is not none %}
+              <div id="chart1"></div>
+
+{% else %}
+              <h1>There isn't data for ac chart</h1>
+{% endif %}
+{% if solar_fig is not none %}
+              <div id="chart2"></div>
+{% else %}
+              <h1>There isn't data for solar chart</h1>
+{% endif %}
+          </div>
+          </div>
+      </div>
+
+      
+      </div>
+  </div>
+  <!-- plotly CDN -->
+{% if ac_fig is not none %}
+  <script type="text/javascript">
+    var graph1 = {{ ac_fig | safe}};
+    Plotly.plot("chart1", graph1,{});
+</script>
+{% endif %}
+{% if solar_fig is not none %}
+<script type="text/javascript">
+    var graph2 = {{ solar_fig | safe}};
+    Plotly.plot("chart2", graph2,{});
+</script>
+{% endif %}
+  </body>
+</html>
