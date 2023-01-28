@@ -9,7 +9,7 @@ on:
 
 jobs:
   publish-docker-image:
-  name: Publish Docker image
+    name: Publish Docker image
     runs-on: ubuntu-latest
     steps:
 
