@@ -2,6 +2,7 @@ FROM python:3-slim as python
 RUN apt-get update &&\
    apt-get install -y curl
 RUN apt-get -y install gcc
+RUN apk add build-base
 ENV PYTHONUNBUFFERED=true
 RUN pip install poetry
 
