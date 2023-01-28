@@ -1,4 +1,6 @@
 FROM python:3-slim as python
+RUN apt-get update
+RUN apt-get -y install gcc
 ENV PYTHONUNBUFFERED=true
 RUN pip install poetry
 
