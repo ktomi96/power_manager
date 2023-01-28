@@ -7,11 +7,9 @@ on:
   pull_request:
     branches: ["*"]
 # permissions are needed if pushing to ghcr.io
-permissions: 
-  packages: write
-
 jobs:
-  build:
+  publish-docker-image:
+  name: Publish Docker image
     runs-on: ubuntu-latest
     steps:
 
