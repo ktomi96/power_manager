@@ -6,12 +6,13 @@ on:
   push:
     branches:
       - 'master'
+      - 'dev'
     tags:
       - 'v*.*.*'
   pull_request:
     branches:
       - 'master'
-
+      - 'dev'
 # permissions are needed if pushing to ghcr.io
 permissions: 
   packages: write
