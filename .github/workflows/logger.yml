@@ -32,7 +32,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Docker meta
-             id: logger # you'll use this in the next step
+             id: meta # you'll use this in the next step
              uses: docker/metadata-action@v4.3.0
              with:
                # list of Docker images to use as base name for tags
@@ -54,6 +54,6 @@ jobs:
           file: ./Dockerfile.logger
           platforms: linux/amd64, linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.logger.outputs.tags }}
-          labels: ${{ steps.logger.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
