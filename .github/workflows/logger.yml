@@ -2,15 +2,10 @@ name: Build logger
 
 # Controls when the workflow will run
 on:
-  workflow_dispatch
   push:
-    branches:
-      - 'master'
-    tags:
-      - 'v*.*.*'
+    branches: ["*"]
   pull_request:
-    branches:
-      - 'master'
+    branches: ["*"]
 
 # permissions are needed if pushing to ghcr.io
 permissions: 
