@@ -33,7 +33,6 @@ SECRET_KEY = os.urandom(32)
 app.config['SECRET_KEY'] = SECRET_KEY
 
 
-
 def is_config():
     return os.path.exists(env_file)
 
@@ -49,14 +48,13 @@ def init_dotenv():
 
 
 def set_dotenv_ac(request):
-    dotenv.set_key(dotenv_path, "ADDRESS",
-                   request.form['ADDRESS'])
+    request_dict = request.form.to_dict()
+    request_dict.pop("csrf_token")
+    request_dict.pop("submit")
 
-    dotenv.set_key(dotenv_path, "TOKEN",
-                   request.form['TOKEN'])
-
-    dotenv.set_key(dotenv_path, "KEY",
-                   request.form['KEY'])
+    for key, value in request_dict.items():
+        dotenv.set_key(env_file, key,
+                       value)
 
 
 @app.route("/")

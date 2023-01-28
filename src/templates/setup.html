@@ -57,6 +57,23 @@
       {{ form.SOLAR_API_KEY.label(class="form-label") }} 
       {{ form.SOLAR_API_KEY(class="form-control") }}
 
+      {{ form.SOLAR_LOGGER_TRIGGER_VALUE.label(class="form-label") }} 
+      {{ form.SOLAR_LOGGER_TRIGGER_VALUE(class="form-control") }}
+
+      {{ form.AC_LOGGER_TRIGGER_VALUE.label(class="form-label") }} 
+      {{ form.AC_LOGGER_TRIGGER_VALUE(class="form-control") }}
+
+      {{ form.LOG_PATH.label(class="form-label") }} 
+      {{ form.LOG_PATH(class="form-control") }}
+      
+      {{ form.DB_PATH.label(class="form-label") }} 
+      {{ form.DB_PATH(class="form-control") }}
+      
+      {{ form.DB.label(class="form-label") }} 
+      {{ form.DB(class="form-control") }}
+
+      {{ form.TIME_ZONE.label(class="form-label") }} 
+      {{ form.TIME_ZONE(class="form-control") }}
       <br />
       {{ form.submit(class="btn btn-primary") }}
       </form>

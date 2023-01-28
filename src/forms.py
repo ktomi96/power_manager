@@ -14,5 +14,17 @@ class AC_login_setup(FlaskForm):
         "Site location id", validators=[InputRequired()])
     SOLAR_API_KEY = StringField(
         "Solar site API key", validators=[InputRequired()])
+    SOLAR_LOGGER_TRIGGER_VALUE = StringField(
+        "Solar logging trigger HH:MM", validators=[InputRequired()])
+    AC_LOGGER_TRIGGER_VALUE = StringField(
+        "AC logging tigger  or HH:MM", validators=[InputRequired()])
+    LOG_PATH = StringField(
+        "Logs path ex.: ./logs/", validators=[InputRequired()])
+    DB_PATH = StringField(
+        "Database path ex.:./database/power_manager.db", validators=[InputRequired()])
+    DB = StringField(
+        "SQLALCHEMY databe type ex.:sqlite:///", validators=[InputRequired()])
+    TIME_ZONE = StringField(
+        "Time zone Country/City", validators=[InputRequired()])
 
     submit = SubmitField("Submit")
