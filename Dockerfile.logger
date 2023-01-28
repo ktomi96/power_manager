@@ -1,7 +1,7 @@
 FROM python:3-slim as python
 RUN apt-get update
 RUN apt-get -y install gcc
-RUN apt-get install --reinstall build-essential
+RUN apt-get -y install --reinstall build-essential
 ENV PYTHONUNBUFFERED=true
 RUN pip install poetry
 
