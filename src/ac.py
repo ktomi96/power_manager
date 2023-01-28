@@ -1,11 +1,10 @@
-from midea_beautiful import appliance_state
+from midea_beautiful import appliance_state, exceptions
 from datetime import datetime
 from datetime import date
 import pandas as pd
 import os
 import dotenv
 from pprint import pprint
-from database import AC_LOG
 
 
 class AC(object):
@@ -17,30 +16,10 @@ class AC(object):
     def get_status(self):
         return appliance_state(address=self.address, token=self.token, key=self.key)
 
-    def ac_status(self, status):
-
+    def ac_status(self):
+        status = self.get_status()
         return {"running": status.state.running, "indoor_temperature": round(status.state.indoor_temperature, 1),
                 "out_door_temperature": round(status.state.outdoor_temperature, 1)}
-
-    def ac_logging(self, csv_path: str):
-        status = self.ac_status(self.get_status())
-        now = datetime.now()
-        status.update({"date_time": datetime.now().__str__()})
-        print(status)
-        self.save_to_csv(status, csv_path)
-
-    def save_to_csv(self, status, csv_path: str):
-        df = pd.DataFrame([status])
-        file_path = f"{csv_path}"+f"ac/{date.today()}_ac_log.csv"
-        if os.path.exists(file_path):
-            df.to_csv(file_path, mode="a", index=False, header=False)
-
-        else:
-            df.to_csv(file_path, mode="w", index=False, header=True)
-
-    def save_to_db(self, status):
-        print(status)
-        ac_data = AC_LOG.append_to_db(**status)
 
     def set_ac_status(self, **kwargs):
         status = self.get_status()

@@ -1,21 +1,31 @@
 #!/usr/bin/env python
-import os
-import requests
-import glob
+try:
+    import os
+    import requests
+    import glob
 
-from flask import Flask, redirect, request, url_for, render_template, escape, flash, session, jsonify
-from livereload import Server, shell
-import dotenv
-import pandas as pd
+    from flask import Flask, redirect, request, url_for, render_template, escape, flash, session, jsonify
+    from livereload import Server, shell
+    import dotenv
+    import pandas as pd
+    from datetime import date, timedelta, datetime
 
-from forms import AC_login_setup
-from plotter import ac_plotter, solar_plotter
-from datetime import date
+    from forms import AC_login_setup
+    from plotter import ac_plotter, solar_plotter
+    from migrate_csv_to_sql import migrate_to_database
+except ImportError:
+    print("Exited with import error")
+    sys.exit(1)
 
+env_path = ("./env/")
+env_file = f"{env_path}.env"
+dotenv.find_dotenv(env_file, raise_error_if_not_found=True)
 
-dotenv_path = "./env/.env"
 logs_dir = ["ac", "solar"]
-logs_path = "./logs/"
+
+logs_path = os.getenv("LOG_PATH")
+db_path = os.getenv("DB_PATH")
+db_url = f"{os.getenv('DB')}{db_path}"
 
 app = Flask(__name__, template_folder="templates/")
 
@@ -23,12 +33,19 @@ SECRET_KEY = os.urandom(32)
 app.config['SECRET_KEY'] = SECRET_KEY
 
 
+
 def is_config():
-    return os.path.exists(dotenv_path)
+    return os.path.exists(env_file)
+
+
+def is_database():
+    if not os.path.exists(db_path):
+        migrate_to_database(logs_path, db_url)
+    return True
 
 
 def init_dotenv():
-    dotenv.load_dotenv(dotenv_path)
+    dotenv.load_dotenv(env_file)
 
 
 def set_dotenv_ac(request):
@@ -44,12 +61,15 @@ def set_dotenv_ac(request):
 
 @app.route("/")
 def home():
-    if not is_config():
+    if not is_config() or not is_database():
         return redirect(url_for("setup_page"))
-    today = date.today().strftime('%Y-%m-%d')
 
-    ac_fig = ac_plotter(today)
-    solar_fig = solar_plotter()
+    today = date.today().strftime('%Y-%m-%d')
+    month_first_day = (datetime.now().replace(day=1)).strftime('%Y-%m-%d')
+    yesterday = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')
+
+    ac_fig = ac_plotter([today, today])
+    solar_fig = solar_plotter([month_first_day, yesterday])
 
     return render_template("home.html", ac_fig=ac_fig, solar_fig=solar_fig)
 
@@ -71,7 +91,7 @@ def setup_page():
 
 @app.route("/ping", methods=["GET"])
 def is_webserver_running():
-    if not is_config():
+    if not is_config() or not is_database():
         return redirect(url_for("setup_page"))
 
     response = {"is_webserver_running": True}
@@ -82,5 +102,5 @@ init_dotenv()
 if __name__ == "__main__":
 
     server = Server(app.wsgi_app)
-    server.watch(dotenv_path)
+    server.watch(env_file, db_path)
     server.serve(host="localhost", port=5000)

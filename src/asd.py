@@ -1,21 +1,21 @@
-import asyncio
-import csv
-from sqlalchemy import create_engine
+import os
+import sys
+from datetime import datetime, timedelta, date
+import pytz
 
-async def migrate_csv_to_sqlalchemy(file_path, table_name, db_url):
-    # create a sqlalchemy engine
-    engine = create_engine(db_url)
+import dotenv
 
-    # read the csv file
-    async with open(file_path, 'r') as csvfile:
-        reader = csv.DictReader(csvfile)
+from database import AC_LOG, query_last_row
 
-        # create a list to store the rows
-        rows = []
+env_path = ("./env/")
+env_file = f"{env_path}.env"
+dotenv.find_dotenv(env_file, raise_error_if_not_found=True)
+dotenv.load_dotenv(env_file)
+try:
 
-        # iterate through the rows in the csv
-        async for row in reader:
-            rows.append(row)
+    time_zone = os.getenv("TIME_ZON",raise_error_if_not_found=True)
+    db_url = f"{os.getenv('sa')}{os.getenv('sa')}"
+    print(time_zone)
+except TypeError:
+    print("ass")
 
-        # insert the rows into the table
-        engine.execute(f"INSERT INTO {table_name} ({', '.join(rows[0].keys())}) VALUES {', '.join(['?' for _ in rows[0].keys()])}", *[tuple(row.values()) for row in rows])

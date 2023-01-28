@@ -1,7 +1,18 @@
-from sqlalchemy import create_engine, ForeignKey, Column, String, Integer, DateTime, Boolean, Float, text
-from sqlalchemy.orm import sessionmaker, declarative_base
-import pandas
+from datetime import datetime
+import pytz
+import os
 
+from sqlalchemy import create_engine, ForeignKey, Column, String, Integer, DateTime, Boolean, Float, text, select
+from sqlalchemy.orm import sessionmaker, declarative_base, Session
+import pandas
+import dotenv
+
+env_path = ("./env/")
+env_file = f"{env_path}.env"
+dotenv.find_dotenv(env_file, raise_error_if_not_found=True)
+dotenv.load_dotenv(env_file)
+time_zone = os.getenv("TIME_ZONE")
+db_url = f"{os.getenv('DB')}{os.getenv('DB_PATH')}"
 
 Base = declarative_base()
 
@@ -12,75 +23,86 @@ class AC_LOG(Base):
     running = Column("running", Boolean)
     indoor_temperature = Column("indoor_temperature", Float)
     out_door_temperature = Column("out_door_temperature", Float)
-    date_time = Column("date_time", String)
-
-    def __init__(self):
-
-        self.engine = create_engine(
-            "sqlite:///./database/power_manager.db", echo=False, future=True)
-        Base.metadata.create_all(bind=self.engine)
-
-        Session = sessionmaker(bind=self.engine)
-        self.session = Session()
+    date_time = Column(DateTime, default=datetime.now(
+        pytz.timezone(time_zone)))
 
     def __repr__(self):
         return f"{self.running}, {self.indoor_temperature}, {self.out_door_temperature}, {self.date_time}"
 
-    def append_to_db(self, **status):
-        self.running = status["running"]
-        self.indoor_temperature = status["indoor_temperature"]
-        self.out_door_temperature = status["out_door_temperature"]
-        self.date_time = status["date_time"]
-
-        self.session.add(self)
-        self.session.commit()
-
-    def query_all(self):
-        return self.session.query(AC_LOG)
-
-    def query_to_df(self):
-        query_data = self.query_all()
-        return pandas.read_sql_query(sql=query_data.statement.compile(self.engine), con=self.engine)
+    # def __dict__(self):
+    #    return {"running": self.running, "indoor_temperature": self.indoor_temperature, "out_door_temperature": self.out_door_temperature, "date_time": self.date_time}
 
 
 class SOLAR_LOG(Base):
     __tablename__ = "solar_logs"
     id = Column(Integer, primary_key=True)
-    date_time = Column("date_time", String)
+    date_time = Column(DateTime, default=datetime.now(
+        pytz.timezone(time_zone)))
     power_generated = Column("power_generated", Float)
     production_time = Column("production_time", Float)
     daytime = Column("daytime", Float)
     efficeny = Column("efficeny", Float)
 
-    def __init__(self):
-        self.engine = create_engine(
-            "sqlite:///./database/power_manager.db", echo=False, future=True)
-        Base.metadata.create_all(bind=self.engine)
-
-        Session = sessionmaker(bind=self.engine)
-        self.session = Session()
-
     def __repr__(self):
         return f"{self.date_time}, {self.power_generated}, {self.production_time}, {self.daytime}, {self.efficeny}"
 
-    def append_to_db(self, **status):
-        self.date_time = status["date_time"]
-        self.power_generated = status["power_generated"]
-        self.production_time = status["production_time"]
-        self.daytime = status["daytime"]
-        self.efficeny = status["efficeny"]
 
-        self.session.add(self)
-        self.session.commit()
+def get_date():
+    return datetime.now(pytz.timezone(time_zone))
 
-    def query_all(self):
-        return self.session.query(SOLAR_LOG)
 
-    def query_to_df(self):
-        query_data = self.query_all()
-        return pandas.read_sql_query(sql=query_data.statement.compile(self.engine), con=self.engine)
+def append_to_db(obj_list: list, db_url):
+    engine = create_engine(db_url, echo=False, future=True)
+    Base.metadata.create_all(bind=engine)
+
+    with Session(engine) as session:
+        session.add_all(obj_list)
+        session.commit()
+
+
+def query(db_url, obj):
+    engine = create_engine(db_url, echo=False, future=False)
+
+    with Session(engine) as session:
+        '''
+        sqlalchemy 2.0 brakes pandas, cant use execute
+        return session.execute(select(obj)).all()
+        '''
+        return session.query(obj)
+
+
+def query_last_row(db_url, obj):
+    engine = create_engine(db_url, echo=False, future=False)
+
+    with Session(engine) as session:
+        '''
+        sqlalchemy 2.0 brakes pandas, cant use execute
+        return session.execute(select(obj)).all()
+        '''
+        return session.query(obj).order_by(obj.id.desc()).first()
+
+
+def query_to_df(db_url, obj, date_from: str, date_to: str):
+    engine = create_engine(db_url, echo=False, future=False)
+    with Session(engine) as session:
+        2022-12-29
+        query_data = session.query(obj).filter(
+            obj.date_time.between(date_from, date_to)).order_by(obj.date_time.asc())
+
+    return pandas.read_sql_query(sql=query_data.statement.compile(engine), con=engine)
 
 
 if __name__ == '__main__':
-    solar = AC_LOG()
-    print(solar.query_all())
+    ac_log = AC_LOG()
+    db_url = "sqlite:///./database/power_manager.db"
+
+    b = AC_LOG(running=True, indoor_temperature=22.0,
+               out_door_temperature=10.0, date_time="2023-01-04 17:38:38.370094")
+    asd = {"running": True, "indoor_temperature": 22.0,
+           "out_door_temperature": 10.0}
+    a = AC_LOG(**asd)
+    # append_to_db([a], db_url)
+    print(query_to_df(db_url, AC_LOG))
+
+    # solar = SOLAR_LOG()
+    # print(solar.query_all())

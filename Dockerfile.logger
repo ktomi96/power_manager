@@ -5,9 +5,9 @@ RUN pip install poetry
 WORKDIR /app
 COPY pyproject.toml poetry.lock ./
 RUN POETRY_VIRTUALENVS_CREATE=false poetry install
-COPY ./src/logger /app/src/logger
-COPY ./src/test /app/src/test
+COPY ./src/ /app/src/
+
 
 ENTRYPOINT ["python"]
-CMD ["/app/src/logger/logger.py"]
-HEALTHCHECK --interval=1m --retries=2 CMD python /app/src/test/logger_test.py || exit 1
+CMD ["/app/src/logger.py"]
+HEALTHCHECK --interval=1m --retries=2 CMD python /app/src/logger_test.py || exit 1

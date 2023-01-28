@@ -12,7 +12,7 @@ import pandas as pd
 import os
 
 # internal imports
-from database import SOLAR_LOG
+
 
 # TODO read location from env variable
 
@@ -47,7 +47,7 @@ class SOLAR(object):
         num_prod_time = 96
         for fo in filterd:
             foo = list(fo.values())
-            strp = datetime.strptime(foo[0], '%Y-%m-%d %H:%M:%S')
+            strp = datetime.strptime(foo[0], "%Y-%m-%d %H:%M:%S")
             foo[0] = strp
             if foo[1] is None:
                 num_prod_time -= 1
@@ -66,11 +66,10 @@ class SOLAR(object):
         daytime = self.get_daytime()
         today_str = date.today().strftime('%Y-%m-%d')
 
-        return {"date_time": today_str, "power_generated": round(power_balance, 2), "production_time": round(prod_time, 2),
+        return {"power_generated": round(power_balance, 2), "production_time": round(prod_time, 2),
                 "daytime": round(daytime, 2), "efficeny": round((prod_time/daytime), 2)}
 
-    def save_to_db(self, status):
-        solar_data = SOLAR_LOG.append_to_db(**status)
+
 
 
 if __name__ == '__main__':
