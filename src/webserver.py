@@ -63,13 +63,15 @@ def home():
     if not is_config() or not is_database():
         return redirect(url_for("setup_page"))
 
-    today = date.today().strftime('%Y-%m-%d')
+    today = date.today().strftime("%Y-%m-%d")
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     month_first_day = (datetime.now().replace(day=1)).strftime('%Y-%m-%d')
     yesterday = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')
+
     if debug:
         print(f"AC plot date: {today}")
         print(f"Solar plot From: {month_first_day}, To: {yesterday}")
-    ac_fig = ac_plotter([today, today])
+    ac_fig = ac_plotter([today, now])
     solar_fig = solar_plotter([month_first_day, yesterday])
 
     return render_template("home.html", ac_fig=ac_fig, solar_fig=solar_fig)

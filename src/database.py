@@ -85,7 +85,6 @@ def query_last_row(db_url, obj):
 def query_to_df(db_url, obj, date_from: str, date_to: str):
     engine = create_engine(db_url, echo=False, future=False)
     with Session(engine) as session:
-        2022-12-29
         query_data = session.query(obj).filter(
             obj.date_time.between(date_from, date_to)).order_by(obj.date_time.asc())
 
@@ -95,14 +94,16 @@ def query_to_df(db_url, obj, date_from: str, date_to: str):
 if __name__ == '__main__':
     ac_log = AC_LOG()
     db_url = "sqlite:///./database/power_manager.db"
-
+    from datetime import date
     b = AC_LOG(running=True, indoor_temperature=22.0,
                out_door_temperature=10.0, date_time="2023-01-04 17:38:38.370094")
     asd = {"running": True, "indoor_temperature": 22.0,
            "out_door_temperature": 10.0}
     a = AC_LOG(**asd)
     # append_to_db([a], db_url)
-    print(query_to_df(db_url, AC_LOG))
-
-    # solar = SOLAR_LOG()
-    # print(solar.query_all())
+    today = date.today().strftime("%Y-%m-%d")
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(today)
+    print(now)
+    print(query_to_df(db_url, AC_LOG,
+          today, now))
