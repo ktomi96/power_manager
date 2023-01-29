@@ -71,42 +71,38 @@ def logger_schulder(*args, ac, solar, hour_value, minute_value):
 
 def ac_logging(ac):  # sourcery skip: extract-duplicate-method
 
-    try:
-        global status_mem
+    global status_mem
 
-        # print(f"Status mem: {status_mem}")
-        status = ac.ac_status()
-        # print(f"Status: {status}")
-        if len(status_mem) == 0:
-            pre_status = ac.ac_status()
-            if pre_status["indoor_temperature"] <= -23.0:
-                pre_status["indoor_temperature"] = 0.0
+    # print(f"Status mem: {status_mem}")
+    status = ac.ac_status()
+    # print(f"Status: {status}")
+    if len(status_mem) == 0:
+        pre_status = ac.ac_status()
+        if pre_status["indoor_temperature"] <= -23.0:
+            pre_status["indoor_temperature"] = 0.0
 
-            if (abs(status["indoor_temperature"] - pre_status["indoor_temperature"]) <= 20 and
-                    abs(status["out_door_temperature"] - pre_status["out_door_temperature"]) <= 20):
-                ac_log = AC_LOG(**status)
-                if debug:
-                    print(f"AC log: {status}")
-                append_to_db([ac_log], db_url)
-                status_mem = status
-                print(f"Logged data: {datetime.now()}")
-            else:
-                print(f"Not valid data, didn't logged it: {datetime.now()}")
-
-        elif (status_mem["indoor_temperature"] + 20 >= status["indoor_temperature"] and
-              status_mem["out_door_temperature"] + 20 >= status["out_door_temperature"]):
-
+        if (abs(status["indoor_temperature"] - pre_status["indoor_temperature"]) <= 20 and
+                abs(status["out_door_temperature"] - pre_status["out_door_temperature"]) <= 20):
             ac_log = AC_LOG(**status)
             if debug:
                 print(f"AC log: {status}")
             append_to_db([ac_log], db_url)
             status_mem = status
-            print(f"logged valid data: {datetime.now()}")
+            print(f"Logged data: {datetime.now()}")
         else:
             print(f"Not valid data, didn't logged it: {datetime.now()}")
 
-    except Exception:
-        print(f"Failed to log ac status {datetime.now()}")
+    elif (status_mem["indoor_temperature"] + 20 >= status["indoor_temperature"] and
+          status_mem["out_door_temperature"] + 20 >= status["out_door_temperature"]):
+
+        ac_log = AC_LOG(**status)
+        if debug:
+            print(f"AC log: {status}")
+        append_to_db([ac_log], db_url)
+        status_mem = status
+        print(f"logged valid data: {datetime.now()}")
+    else:
+        print(f"Not valid data, didn't logged it: {datetime.now()}")
 
 
 def solar_logging(solar):
@@ -132,3 +128,5 @@ def main(ac_logger_trigger_value, solar_logger_triger_value):
 if __name__ == '__main__':
     status_mem = {}
     main(ac_logger_trigger_value, solar_logger_triger_value)
+    # ac = AC(address=address, token=token, key=key)
+    # ac_logging(ac)

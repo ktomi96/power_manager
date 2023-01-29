@@ -14,6 +14,7 @@ dotenv.load_dotenv(env_file)
 
 time_zone = os.getenv("TIME_ZONE")
 db_url = f"{os.getenv('DB')}{os.getenv('DB_PATH')}"
+debug = (os.getenv("DEBUG") == "True")
 
 
 def open_log_file(path: str):
@@ -34,8 +35,15 @@ def main():
     logs_path = "./logs/"
     log_type = "ac"
     ac_query_dict = query_last_row(db_url, AC_LOG).__dict__
+    ac_query_time = ac_query_dict["date_time"].replace(tzinfo=pytz.UTC)
+    time_to_compare = ac_query_time + timedelta(minutes=2)
+    now = datetime.now(pytz.timezone(time_zone))
 
-    if (ac_query_dict["date_time"] + timedelta(minutes=2)) < datetime.now():
+    if debug:
+        print(f"Plus time: {time_to_compare}")
+        print(f"Current time: {now}")
+
+    if time_to_compare < now:
         print("System exited with : 1")
         sys.exit(1)
     else:

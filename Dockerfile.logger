@@ -13,4 +13,4 @@ COPY ./src/ /app/src/
 
 ENTRYPOINT ["python"]
 CMD ["/app/src/logger.py"]
-HEALTHCHECK --interval=1m --retries=2 CMD python /app/src/logger_test.py || exit 1
+HEALTHCHECK --interval=1m --retries=3 CMD python /app/src/logger_test.py || exit 1

@@ -2,7 +2,7 @@ from datetime import datetime
 import pytz
 import os
 
-from sqlalchemy import create_engine, ForeignKey, Column, String, Integer, DateTime, Boolean, Float, text, select
+from sqlalchemy import create_engine, ForeignKey, Column, String, Integer, DateTime, Boolean, Float, text, select, func
 from sqlalchemy.orm import sessionmaker, declarative_base, Session
 import pandas
 import dotenv
@@ -23,8 +23,7 @@ class AC_LOG(Base):
     running = Column("running", Boolean)
     indoor_temperature = Column("indoor_temperature", Float)
     out_door_temperature = Column("out_door_temperature", Float)
-    date_time = Column(DateTime, default=datetime.now(
-        pytz.timezone(time_zone)))
+    date_time = Column(DateTime, default=func.now())
 
     def __repr__(self):
         return f"{self.running}, {self.indoor_temperature}, {self.out_door_temperature}, {self.date_time}"
@@ -36,8 +35,7 @@ class AC_LOG(Base):
 class SOLAR_LOG(Base):
     __tablename__ = "solar_logs"
     id = Column(Integer, primary_key=True)
-    date_time = Column(DateTime, default=datetime.now(
-        pytz.timezone(time_zone)))
+    date_time = Column(DateTime, default=func.now())
     power_generated = Column("power_generated", Float)
     production_time = Column("production_time", Float)
     daytime = Column("daytime", Float)
@@ -88,7 +86,11 @@ def query_to_df(db_url, obj, date_from: str, date_to: str):
         query_data = session.query(obj).filter(
             obj.date_time.between(date_from, date_to)).order_by(obj.date_time.asc())
 
-    return pandas.read_sql_query(sql=query_data.statement.compile(engine), con=engine)
+    df = pandas.read_sql_query(
+        sql=query_data.statement.compile(engine), con=engine)
+    df["date_time"] = df["date_time"].dt.tz_localize('UTC')
+    df["date_time"] = df["date_time"].dt.tz_convert(time_zone)
+    return df
 
 
 if __name__ == '__main__':
@@ -105,5 +107,7 @@ if __name__ == '__main__':
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(today)
     print(now)
-    print(query_to_df(db_url, AC_LOG,
-          today, now))
+    df = query_to_df(db_url, AC_LOG,
+                     today, now)
+
+    print(df.tail())

@@ -20,6 +20,7 @@ log_path = os.getenv("LOG_PATH")
 db_url = f"{os.getenv('DB')}{os.getenv('DB_PATH')}"
 debug = (os.getenv("DEBUG") == "True")
 
+
 def migrate_to_database(log_path, db_url):
     paths = [f"{log_path}solar/", f"{log_path}ac/"]
     obj_list = []
@@ -31,18 +32,24 @@ def migrate_to_database(log_path, db_url):
             with open(path+log) as f:
                 reader = csv.DictReader(f)
                 for row in reader:
-                    if debug:
-                        print(row)
+                    # if debug:
+                    # print(row)
                     if path == paths[0]:
-                        row["date_time"] = time_zone_obj.localize(datetime.strptime(
-                            str(row["date_time"]), "%Y-%m-%d"))
+                        time = datetime.strptime(
+                            row["date_time"], "%Y-%m-%d")
+                        time_aware = time_zone_obj.localize(time)
+                        print(time_aware.astimezone(pytz.UTC))
+                        row["date_time"] = time_aware.astimezone(pytz.UTC).replace(microsecond=0)
 
                         obj_list.append(SOLAR_LOG(**row))
 
                     elif path == paths[1]:
-                        row["date_time"] = time_zone_obj.localize(datetime.strptime(
-                            str(row["date_time"]), "%Y-%m-%d %H:%M:%S.%f"))
+                        time = datetime.strptime(
+                            row["date_time"], "%Y-%m-%d %H:%M:%S.%f")
+                        time_aware = time_zone_obj.localize(time)
+                        row["date_time"] = time_aware.astimezone(pytz.UTC).replace(microsecond=0)
                         row["running"] = row["running"] == "True"
+
                         obj_list.append(AC_LOG(**row))
                         test_data = row
 

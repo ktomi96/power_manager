@@ -105,5 +105,5 @@ init_dotenv()
 if __name__ == "__main__":
 
     server = Server(app.wsgi_app)
-    server.watch(env_file, db_path)
+    server.watch(env_file)
     server.serve(host="localhost", port=5000)
