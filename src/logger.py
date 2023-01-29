@@ -16,7 +16,7 @@ env_path = ("./env/")
 env_file = f"{env_path}.env"
 dotenv.find_dotenv(env_file, raise_error_if_not_found=True)
 dotenv.load_dotenv(env_file)
-address = os.getenv("ADDRESS")
+address = os.getenv("AC_IP_ADDRESS")
 token = os.getenv("TOKEN")
 key = os.getenv("KEY")
 location_id = os.getenv("LOCATION_ID")
@@ -26,6 +26,7 @@ solar_logger_triger_value = os.getenv("SOLAR_LOGGER_TRIGGER_VALUE")
 ac_logger_trigger_value = os.getenv("AC_LOGGER_TRIGGER_VALUE")
 time_zone = os.getenv("TIME_ZONE")
 db_url = f"{os.getenv('DB')}{os.getenv('DB_PATH')}"
+debug = (os.getenv("DEBUG") == "True")
 
 
 def removechar(str1, n):
@@ -84,6 +85,8 @@ def ac_logging(ac):  # sourcery skip: extract-duplicate-method
             if (abs(status["indoor_temperature"] - pre_status["indoor_temperature"]) <= 20 and
                     abs(status["out_door_temperature"] - pre_status["out_door_temperature"]) <= 20):
                 ac_log = AC_LOG(**status)
+                if debug:
+                    print(f"AC log: {status}")
                 append_to_db([ac_log], db_url)
                 status_mem = status
                 print(f"Logged data: {datetime.now()}")
@@ -94,19 +97,23 @@ def ac_logging(ac):  # sourcery skip: extract-duplicate-method
               status_mem["out_door_temperature"] + 20 >= status["out_door_temperature"]):
 
             ac_log = AC_LOG(**status)
+            if debug:
+                print(f"AC log: {status}")
             append_to_db([ac_log], db_url)
             status_mem = status
             print(f"logged valid data: {datetime.now()}")
         else:
             print(f"Not valid data, didn't logged it: {datetime.now()}")
 
-    except MideaNetworkError:
+    except Exception:
         print(f"Failed to log ac status {datetime.now()}")
 
 
 def solar_logging(solar):
     status = solar.solar_data()
     solar_log = SOLAR_LOG(**status)
+    if debug:
+        print(f"AC log: {status}")
     append_to_db([solar_log], db_url)
     print(f"Logged solar data: {datetime.now()}")
 

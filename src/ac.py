@@ -1,4 +1,4 @@
-from midea_beautiful import appliance_state, exceptions
+from midea_beautiful import appliance_state
 from datetime import datetime
 from datetime import date
 import pandas as pd
@@ -42,7 +42,7 @@ def main():
     dotenv.find_dotenv(env_file, raise_error_if_not_found=True)
     dotenv.load_dotenv(env_file)
 
-    address = os.getenv("ADDRESS")
+    address = os.getenv("AC_IP_ADDRESS")
     token = os.getenv("TOKEN")
     key = os.getenv("KEY")
     log_path = os.getenv("LOG_PATH")

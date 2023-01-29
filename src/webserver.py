@@ -26,6 +26,7 @@ logs_dir = ["ac", "solar"]
 logs_path = os.getenv("LOG_PATH")
 db_path = os.getenv("DB_PATH")
 db_url = f"{os.getenv('DB')}{db_path}"
+debug = (os.getenv("DEBUG") == "True")
 
 app = Flask(__name__, template_folder="templates/")
 
@@ -65,7 +66,9 @@ def home():
     today = date.today().strftime('%Y-%m-%d')
     month_first_day = (datetime.now().replace(day=1)).strftime('%Y-%m-%d')
     yesterday = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')
-
+    if debug:
+        print(f"AC plot date: {today}")
+        print(f"Solar plot From: {month_first_day}, To: {yesterday}")
     ac_fig = ac_plotter([today, today])
     solar_fig = solar_plotter([month_first_day, yesterday])
 

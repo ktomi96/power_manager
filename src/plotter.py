@@ -20,6 +20,7 @@ env_file = f"{env_path}.env"
 dotenv.find_dotenv(env_file, raise_error_if_not_found=True)
 dotenv.load_dotenv(env_file)
 db_url = f"{os.getenv('DB')}{os.getenv('DB_PATH')}"
+debug = (os.getenv("DEBUG") == "True")
 
 
 def ac_plot(df):
@@ -70,7 +71,8 @@ def ac_plotter(range_to_plot: list):
 
     try:
         ac_df = query_to_df(db_url, AC_LOG, range_to_plot[0], range_to_plot[1])
-
+        if debug:
+            print(ac_df)
         return None if ac_df.empty else ac_plot(ac_df)
 
     except ValueError:
@@ -84,7 +86,8 @@ def solar_plotter(range_to_plot: list):
     try:
         solar_df = query_to_df(
             db_url, SOLAR_LOG, range_to_plot[0], range_to_plot[1])
-
+        if debug:
+            print(solar_df)
         return None if solar_df.empty else solar_plot(solar_df)
     except ValueError:
         return None

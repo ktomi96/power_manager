@@ -18,7 +18,7 @@ dotenv.load_dotenv(env_file)
 time_zone = os.getenv("TIME_ZONE")
 log_path = os.getenv("LOG_PATH")
 db_url = f"{os.getenv('DB')}{os.getenv('DB_PATH')}"
-
+debug = (os.getenv("DEBUG") == "True")
 
 def migrate_to_database(log_path, db_url):
     paths = [f"{log_path}solar/", f"{log_path}ac/"]
@@ -31,6 +31,8 @@ def migrate_to_database(log_path, db_url):
             with open(path+log) as f:
                 reader = csv.DictReader(f)
                 for row in reader:
+                    if debug:
+                        print(row)
                     if path == paths[0]:
                         row["date_time"] = time_zone_obj.localize(datetime.strptime(
                             str(row["date_time"]), "%Y-%m-%d"))
