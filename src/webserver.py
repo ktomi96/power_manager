@@ -3,12 +3,12 @@ try:
     import os
     import requests
     import glob
+    from datetime import date, timedelta, datetime
 
     from flask import Flask, redirect, request, url_for, render_template, escape, flash, session, jsonify
     from livereload import Server, shell
     import dotenv
     import pandas as pd
-    from datetime import date, timedelta, datetime
 
     from forms import AC_login_setup
     from plotter import ac_plotter, solar_plotter
@@ -63,16 +63,28 @@ def home():
     if not is_config() or not is_database():
         return redirect(url_for("setup_page"))
 
-    today = date.today().strftime("%Y-%m-%d")
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    month_first_day = (datetime.now().replace(day=1)).strftime('%Y-%m-%d')
-    yesterday = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d')
+    today = datetime.utcnow().date()
+    today_str = today.strftime("%Y-%m-%d")
+
+    now = datetime.utcnow()
+    now_str = now.strftime("%Y-%m-%d %H:%M:%S")
+
+    month_first_day = (now.replace(day=1))
+    month_first_day_str = month_first_day.strftime("%Y-%m-%d")
+
+    yesterday = (today - timedelta(days=1))
+    yesterday_str = yesterday.strftime("%Y-%m-%d")
+
+    after_solar_log = now.replace(hour=23, minute=00)
+
+    if now < after_solar_log:
+        yesterday_str = now_str
 
     if debug:
-        print(f"AC plot date: {today}")
-        print(f"Solar plot From: {month_first_day}, To: {yesterday}")
-    ac_fig = ac_plotter([today, now])
-    solar_fig = solar_plotter([month_first_day, yesterday])
+        print(f"AC plot date: {today_str}")
+        print(f"Solar plot From: {month_first_day_str}, To: {yesterday_str}")
+    ac_fig = ac_plotter([today_str, now_str])
+    solar_fig = solar_plotter([month_first_day_str, yesterday_str])
 
     return render_template("home.html", ac_fig=ac_fig, solar_fig=solar_fig)
 

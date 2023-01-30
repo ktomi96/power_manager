@@ -86,6 +86,7 @@ def solar_plotter(range_to_plot: list):
     try:
         solar_df = query_to_df(
             db_url, SOLAR_LOG, range_to_plot[0], range_to_plot[1])
+        solar_df["date_time"] = solar_df["date_time"].dt.strftime('%Y-%m-%d')
         if debug:
             print(solar_df)
         return None if solar_df.empty else solar_plot(solar_df)
@@ -117,4 +118,4 @@ if __name__ == "__main__":
     # df = pd.concat(df_list, ignore_index=True)
     # ac_plot(df)
     # path = "./logs/solar"
-    solar_plotter(["2022-12-29", "2022-12-30"])
+    solar_plotter(["2023-01-29", "2023-01-29"])

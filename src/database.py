@@ -88,8 +88,10 @@ def query_to_df(db_url, obj, date_from: str, date_to: str):
 
     df = pandas.read_sql_query(
         sql=query_data.statement.compile(engine), con=engine)
+    df["date_time"] = pandas.to_datetime(df["date_time"])
     df["date_time"] = df["date_time"].dt.tz_localize('UTC')
     df["date_time"] = df["date_time"].dt.tz_convert(time_zone)
+   
     return df
 
 
@@ -103,11 +105,12 @@ if __name__ == '__main__':
            "out_door_temperature": 10.0}
     a = AC_LOG(**asd)
     # append_to_db([a], db_url)
+
     today = date.today().strftime("%Y-%m-%d")
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(today)
     print(now)
-    df = query_to_df(db_url, AC_LOG,
+    df = query_to_df(db_url, SOLAR_LOG,
                      today, now)
 
     print(df.tail())

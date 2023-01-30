@@ -38,8 +38,8 @@ def migrate_to_database(log_path, db_url):
                         time = datetime.strptime(
                             row["date_time"], "%Y-%m-%d")
                         time_aware = time_zone_obj.localize(time)
-                        print(time_aware.astimezone(pytz.UTC))
-                        row["date_time"] = time_aware.astimezone(pytz.UTC).replace(microsecond=0)
+                        #print(time_aware.astimezone(pytz.UTC))
+                        row["date_time"] = time_aware.astimezone(pytz.UTC)
 
                         obj_list.append(SOLAR_LOG(**row))
 
@@ -47,9 +47,9 @@ def migrate_to_database(log_path, db_url):
                         time = datetime.strptime(
                             row["date_time"], "%Y-%m-%d %H:%M:%S.%f")
                         time_aware = time_zone_obj.localize(time)
-                        row["date_time"] = time_aware.astimezone(pytz.UTC).replace(microsecond=0)
+                        row["date_time"] = time_aware.astimezone(pytz.UTC)
                         row["running"] = row["running"] == "True"
-
+ 
                         obj_list.append(AC_LOG(**row))
                         test_data = row
 
