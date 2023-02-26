@@ -20,6 +20,7 @@ py-solaredge = "^0.0.4.9"
 plotly = "^5.11.0"
 memoization = "^0.4.0"
 sqlalchemy = "1.4.46"
+mvm-smart-metering = "^0.0.12"
 
 
 [build-system]
