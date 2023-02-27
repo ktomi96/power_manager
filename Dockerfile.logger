@@ -1,5 +1,6 @@
 FROM python:3-slim as python
-RUN apt-get update
+RUN apt-get update && \
+    apt-get install -y firefox-esr
 RUN apt-get -y install gcc
 RUN apt-get -y install --reinstall build-essential
 # Install Firefox and geckodriver
@@ -8,6 +9,8 @@ RUN wget -qO- https://github.com/mozilla/geckodriver/releases/download/v0.30.0/g
 
 # Set display environment variable (needed for running Firefox in headless mode)
 ENV DISPLAY=:99
+ENV MOZ_HEADLESS=1
+
 ENV PYTHONUNBUFFERED=true
 RUN pip install poetry
 
