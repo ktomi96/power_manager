@@ -15,19 +15,19 @@ import dotenv
 # internal import
 from database import AC_LOG, SOLAR_LOG, query_to_df
 
-env_path = ("./env/")
+env_path = "./env/"
 env_file = f"{env_path}.env"
 dotenv.find_dotenv(env_file, raise_error_if_not_found=True)
 dotenv.load_dotenv(env_file)
 db_url = f"{os.getenv('DB')}{os.getenv('DB_PATH')}"
-debug = (os.getenv("DEBUG") == "True")
+debug = os.getenv("DEBUG") == "True"
 
 
 def ac_plot(df):
     try:
         pio.templates.default = "plotly_white"
         # df = pd.read_csv('logs/ac/2022-12-19_ac_log.csv')
-        df = df.set_index('date_time')
+        df = df.set_index("date_time")
         cols = df.columns[1:]
         ncols = len(cols)
 
@@ -36,8 +36,9 @@ def ac_plot(df):
         fig = make_subplots(rows=ncols, cols=1, shared_xaxes=True)
 
         for i, col in enumerate(cols, start=1):
-            fig.add_trace(go.Scatter(x=df[col].index,
-                                     y=df[col].values, name=col), row=i, col=1)
+            fig.add_trace(
+                go.Scatter(x=df[col].index, y=df[col].values, name=col), row=i, col=1
+            )
 
         return json.dumps(fig, cls=utils.PlotlyJSONEncoder)
 
@@ -48,14 +49,17 @@ def ac_plot(df):
 def solar_plot(df):
     try:
         pio.templates.default = "plotly_white"
-        df = df.set_index('date_time')
+        df = df.set_index("date_time")
         cols = df.columns[1:3]
         ncols = len(cols)
         fig = make_subplots(rows=ncols, cols=1, shared_xaxes=True)
 
         for i, col in enumerate(cols, start=1):
-            fig.add_trace(go.Bar(x=df[col].index,
-                                 y=df[col].values, name=col), row=i, col=1,)
+            fig.add_trace(
+                go.Bar(x=df[col].index, y=df[col].values, name=col),
+                row=i,
+                col=1,
+            )
         # fig.show()
         return json.dumps(fig, cls=utils.PlotlyJSONEncoder)
 
@@ -84,9 +88,8 @@ def solar_plotter(range_to_plot: list):
     if date_time_validator(range_to_plot) != True:
         return None
     try:
-        solar_df = query_to_df(
-            db_url, SOLAR_LOG, range_to_plot[0], range_to_plot[1])
-        solar_df["date_time"] = solar_df["date_time"].dt.strftime('%Y-%m-%d')
+        solar_df = query_to_df(db_url, SOLAR_LOG, range_to_plot[0], range_to_plot[1])
+        solar_df["date_time"] = solar_df["date_time"].dt.strftime("%Y-%m-%d")
         if debug:
             print(solar_df)
         return None if solar_df.empty else solar_plot(solar_df)
@@ -99,7 +102,7 @@ def merge_csv(folder, filename):
     df_list = (pd.read_csv(file) for file in csv_files)
     df = pd.concat(df_list, ignore_index=False, sort=True)
     # df['date_time'] = pd.to_datetime(df['date_time'])
-    df.sort_values(by='date_time', inplace=True)
+    df.sort_values(by="date_time", inplace=True)
     return df
 
 
@@ -118,4 +121,4 @@ if __name__ == "__main__":
     # df = pd.concat(df_list, ignore_index=True)
     # ac_plot(df)
     # path = "./logs/solar"
-    solar_plotter(["2023-01-29", "2023-01-29"])
+    solar_plotter(["2023-01-30", "2023-01-30"])

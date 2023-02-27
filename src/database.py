@@ -14,6 +14,7 @@ from sqlalchemy import (
     text,
     select,
     func,
+    inspect,
 )
 from sqlalchemy.orm import sessionmaker, declarative_base, Session
 import pandas
@@ -140,11 +141,17 @@ def query_to_df(db_url, obj, date_from: str, date_to: str):
     return df
 
 
+def is_table_exists(db_url: str, table_name: str):
+    engine = create_engine(db_url, echo=False, future=False)
+    inspector = inspect(engine)
+
+    return table_name in inspector.get_table_names()
+
 if __name__ == "__main__":
     ac_log = AC_LOG()
     db_url = "sqlite:///./database/power_manager.db"
     from datetime import date
-
+"""
     b = AC_LOG(
         running=True,
         indoor_temperature=22.0,
@@ -162,3 +169,5 @@ if __name__ == "__main__":
     df = query_to_df(db_url, SOLAR_LOG, today, now)
 
     print(df.tail())
+"""
+print(is_table_exists(db_url, "power_meter_aggregate"))

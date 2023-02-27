@@ -129,7 +129,7 @@ def ac_logging(ac):  # sourcery skip: extract-duplicate-method
                     print(f"AC log: {status}")
                 append_to_db([ac_log], db_url)
                 status_mem = status
-                print(f"Logged data: {datetime.now()}")
+                print(f"Logged ac data: {datetime.now()}")
             else:
                 print(f"Not valid data, didn't logged it: {datetime.now()}")
 
@@ -144,11 +144,12 @@ def ac_logging(ac):  # sourcery skip: extract-duplicate-method
                 print(f"AC log: {status}")
             append_to_db([ac_log], db_url)
             status_mem = status
-            print(f"logged valid data: {datetime.now()}")
+            print(f"Logged ac data: {datetime.now()}")
         else:
             print(f"Not valid data, didn't logged it: {datetime.now()}")
 
-    except Exception:
+    except Exception as e:
+        print(e)
         print(f"Coulnd't log ac data: {datetime.now()}")
 
 
@@ -160,7 +161,8 @@ def solar_logging(solar):
             print(f"AC log: {status}")
         append_to_db([solar_log], db_url)
         print(f"Logged solar data: {datetime.now()}")
-    except Exception:
+    except Exception as e:
+        print(e)
         print(f"Coulnd't log solar data: {datetime.now()}")
 
 
@@ -168,7 +170,8 @@ def power_meter_logging(username: str, password: str, install_date: str):
     try:
         power_meter_logger(username, password, install_date)
 
-    except Exception:
+    except Exception as e:
+        print(e)
         print(f"Coulnd't log power meter: {datetime.now()}")
 
 

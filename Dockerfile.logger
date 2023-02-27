@@ -2,6 +2,12 @@ FROM python:3-slim as python
 RUN apt-get update
 RUN apt-get -y install gcc
 RUN apt-get -y install --reinstall build-essential
+# Install Firefox and geckodriver
+RUN apt-get install -y firefox
+RUN wget -qO- https://github.com/mozilla/geckodriver/releases/download/v0.32.2/geckodriver-v0.32.2-linux64.tar.gz | tar xvz -C /usr/local/bin
+
+# Set display environment variable (needed for running Firefox in headless mode)
+ENV DISPLAY=:99
 ENV PYTHONUNBUFFERED=true
 RUN pip install poetry
 
