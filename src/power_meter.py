@@ -24,28 +24,23 @@ username = os.getenv("USERNAME")
 password = os.getenv("PASSWORD")
 db_url = f"{os.getenv('DB')}{os.getenv('DB_PATH')}"
 install_date = os.getenv("INSTALL_DATE")
-
-
-def check_if_db_exists(db_url: str):
-    return is_table_exists(db_url, "power_meter") and is_table_exists(
-        db_url, "power_meter_aggregate"
-    )
+start_mvm_metering_parse_all = os.getenv("START_MVM_METERING_PARSE_ALL")
 
 
 def power_meter_logger(username: str, password: str, install_date: str):
     date_from = (date.today() - timedelta(1)).strftime("%Y.%m.%d")
     date_to = date_from
 
-    if not check_if_db_exists(db_url):
+    if start_mvm_metering_parse_all == "True":
         print("Parsing all date from power meter installation date, it might take long")
-        date_from = install_date
+        date_from = "2023.02.20"
 
         log_power_data(username, password, date_from, date_to, is_initial_run=True)
         print(f"Imported and appended all power meter data: {datetime.now()}")
+        return dotenv.set_key(env_file, "START_MVM_METERING_PARSE_ALL", "False")
 
-    else:
-        log_power_data(username, password, date_from, date_to)
-        print(f"Logged power meter data: {datetime.now()}")
+    log_power_data(username, password, date_from, date_to)
+    return print(f"Logged power meter data: {datetime.now()}")
 
 
 def log_power_data(
