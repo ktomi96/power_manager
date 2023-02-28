@@ -33,7 +33,7 @@ def power_meter_logger(username: str, password: str, install_date: str):
 
     if start_mvm_metering_parse_all == "True":
         print("Parsing all date from power meter installation date, it might take long")
-        date_from = "2023.02.20"
+        date_from = install_date
 
         log_power_data(username, password, date_from, date_to, is_initial_run=True)
         print(f"Imported and appended all power meter data: {datetime.now()}")

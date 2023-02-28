@@ -676,14 +676,14 @@ requests = ">=2.0"
 
 [[package]]
 name = "mvm-smart-metering"
-version = "0.0.12"
+version = "0.0.13"
 description = "Script for scraping mvm smart meter data"
 category = "main"
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "mvm_smart_metering-0.0.12-py3-none-any.whl", hash = "sha256:88a45890eaf70a87d9ae9af05a7089115e7d996110abcd1788887e137a76a939"},
-    {file = "mvm_smart_metering-0.0.12.tar.gz", hash = "sha256:d384dd0609fbbbb6cf728bd3cb58b521db5ddc9aeeef502add7db514b4e85756"},
+    {file = "mvm_smart_metering-0.0.13-py3-none-any.whl", hash = "sha256:ad03cde2160a2466a574806e781eb314a11b5995040207b600a14e003dcd8641"},
+    {file = "mvm_smart_metering-0.0.13.tar.gz", hash = "sha256:26a4d68fcaa64a72ada93b6177915fa3f5cdaa903603b7b8e157b8e941919c05"},
 ]
 
 [package.dependencies]
@@ -1312,4 +1312,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "e157e03ce2c70c1f59305d546909026395244d4c7b6167189df526b326f23f79"
+content-hash = "b52651a22876eac4cb486595285fa8293970f87631763f0abfad9ddbb6afc049"
