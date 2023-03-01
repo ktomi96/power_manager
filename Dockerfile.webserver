@@ -1,17 +1,18 @@
-FROM python:3-slim as python
-RUN apt-get update &&\
-   apt-get install -y curl
-RUN apt-get -y install gcc
-RUN apt-get -y install --reinstall build-essential
+FROM python:slim-buster
+
 ENV PYTHONUNBUFFERED=true
-RUN pip install poetry
+
+RUN apt update && \
+    apt install --no-install-recommends -y curl && \
+    pip install poetry && \
+    apt clean && rm -rf /var/lib/apt/lists/*
+
 
 WORKDIR /app
 COPY pyproject.toml poetry.lock ./
 RUN POETRY_VIRTUALENVS_CREATE=false poetry install
 COPY ./src/ /app/src/
 EXPOSE 5000
-ENV FLASK_APP=/app/src/webserver.py
-ENTRYPOINT [ "flask"]
-CMD [ "run", "--host", "0.0.0.0" ]
+ENV GUNICORN_CMD_ARGS="--chdir=./src/"
+CMD gunicorn -w 1 --threads 2 -b 0.0.0.0:5000 --access-logfile - webserver:app
 HEALTHCHECK --interval=5m --retries=2 CMD curl --fail http://localhost:5000/ping || exit 1

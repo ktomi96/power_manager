@@ -21,6 +21,7 @@ plotly = "^5.11.0"
 memoization = "^0.4.0"
 sqlalchemy = "1.4.46"
 mvm-smart-metering = "^0.0.13"
+gunicorn = "^20.1.0"
 
 
 [build-system]

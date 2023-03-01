@@ -1,13 +1,4 @@
-FROM python:3-slim as python
-RUN apt-get update && \
-    apt-get install -y firefox-esr && \
-    apt-get install -y wget && \
-    apt-get install -y libgtk-3-dev libdbus-glib-1-dev xvfb
-
-RUN apt-get -y install gcc
-RUN apt-get -y install --reinstall build-essential
-# Install Firefox and geckodriver
-RUN wget -qO- https://github.com/mozilla/geckodriver/releases/latest/download/geckodriver-v$(wget -qO- https://api.github.com/repos/mozilla/geckodriver/releases/latest | grep tag_name | sed -E 's/.*"v([^"]+)".*/\1/')-linux64.tar.gz | tar xvz -C /usr/local/bin
+FROM python:slim-buster
 
 # Set display environment variable (needed for running Firefox in headless mode)
 ENV DISPLAY=:99
@@ -15,7 +6,12 @@ ENV MOZ_HEADLESS=1
 ENV GECKO_DRIVER_PATH=/usr/local/bin/geckodriver
 
 ENV PYTHONUNBUFFERED=true
-RUN pip install poetry
+
+RUN apt update && \
+    apt install -y --no-install-recommends wget firefox-esr && \
+    wget -qO- https://github.com/mozilla/geckodriver/releases/latest/download/geckodriver-v$(wget -qO- https://api.github.com/repos/mozilla/geckodriver/releases/latest | grep tag_name | sed -E 's/.*"v([^"]+)".*/\1/')-linux64.tar.gz | tar xvz -C /usr/local/bin && \
+    pip install poetry && \ 
+    apt clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY pyproject.toml poetry.lock ./
