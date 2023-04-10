@@ -3,9 +3,9 @@ name: Build logger
 # Controls when the workflow will run
 on:
   push:
-    branches: ["*"]
+    branches: ["master"]
   pull_request:
-    branches: ["*"]
+    branches: ["master"]
 
 jobs:
   publish-docker-image:
