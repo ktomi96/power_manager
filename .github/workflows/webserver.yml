@@ -3,9 +3,9 @@ name: Build webserver
 # Controls when the workflow will run
 on:
   push:
-    branches: ["*"]
+    branches: ["master"]
   pull_request:
-    branches: ["*"]
+    branches: ["master"]
 # permissions are needed if pushing to ghcr.io
 jobs:
   publish-docker-image:
