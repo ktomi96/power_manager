@@ -9,6 +9,8 @@ try:
     from datetime import datetime
 
     from apscheduler.schedulers.blocking import BlockingScheduler
+    from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
+
 except ImportError:
     print("Import Error")
 
@@ -32,6 +34,9 @@ username = os.getenv("USERNAME")
 password = os.getenv("PASSWORD")
 install_date = os.getenv("INSTALL_DATE")
 power_logger_trigger_value = os.getenv("POWER_LOGGER_TRIGGER_VALUE")
+
+
+jobs_dict = {}
 
 
 def removechar(str1, n):
@@ -76,25 +81,76 @@ def convert_trigger_value(
     # return int(ac_logger_trigger_value), int(hour_value), int(minute_value)
 
 
+def reset_retries(job_id: str):
+    jobs_dict[job_id]["job_retries"] = 3
+
+
+def create_job(scheduler, **kwargs):
+    job = scheduler.add_job(**kwargs)
+    jobs_dict.update({job.id: {"job_retries": 3, "job_name": job.func}})
+
+
+def job_handler(event):
+    job_id = event.job_id
+
+    if event.exception and jobs_dict[job_id]["job_retries"] > 0:
+        return handle_job_exception(job_id, event)
+    if "-retry" not in job_id:
+        reset_retries(job_id)
+
+
+def handle_job_exception(job_id, event):
+    print(f"Job ID {job_id} failed with exception: {event.exception}")
+    # if job failed, create a new instance of it
+    new_job_id = f"{job_id}-retry"
+
+    if jobs_dict[job_id]["job_name"] in [solar_logging, power_meter_logging]:
+        extra_time = 60
+    else:
+        extra_time = 2
+
+    trigger_time = datetime.now() + timedelta(minute=extra_time)
+    new_task = scheduler.add_job(
+        func=jobs_dict[job_id]["job_name"],
+        trigger="date",
+        run_date=trigger_time,
+        id=new_job_id,
+    )
+    print(f"New job ID {new_job_id} created to retry the job.")
+    jobs_dict[job_id]["job_retries"] -= 1
+
+
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+
 def logger_schulder(*args, ac, solar, trigger_values_dict):
     scheduler = BlockingScheduler(timezone=time_zone)
-    scheduler.add_job(
-        ac_logging, args=[ac], trigger="interval", minutes=int(ac_logger_trigger_value)
+    create_job(
+        scheduler=scheduler,
+        func=ac_logging,
+        args=[ac],
+        trigger="interval",
+        minutes=int(ac_logger_trigger_value),
     )
-    scheduler.add_job(
-        solar_logging,
+    create_job(
+        scheduler=scheduler,
+        func=solar_logging,
         args=[solar],
         trigger="cron",
         hour=trigger_values_dict["solar_logger_trigger_hour"],
         minute=trigger_values_dict["solar_logger_trigger_minute"],
     )
-    scheduler.add_job(
-        power_meter_logging,
+    create_job(
+        scheduler=scheduler,
+        func=power_meter_logging,
         args=[username, password, install_date],
         trigger="cron",
         hour=trigger_values_dict["power_logger_trigger_hour"],
         minute=trigger_values_dict["power_logger_trigger_minute"],
     )
+
+    scheduler.add_listener(job_handler, EVENT_JOB_ERROR | EVENT_JOB_EXECUTED)
     print("Press Ctrl+C to exit")
     try:
         scheduler.start()
@@ -102,6 +158,9 @@ def logger_schulder(*args, ac, solar, trigger_values_dict):
         print("SystemExit, shutdown down")
     except KeyboardInterrupt:
         print("Ctrl+C was pressed, shutdown down")
+    except Exception as esc:
+        print(f"Job failed with {esc}")
+        scheduler.add_job(func)
 
 
 def ac_logging(ac):  # sourcery skip: extract-duplicate-method
@@ -138,7 +197,6 @@ def ac_logging(ac):  # sourcery skip: extract-duplicate-method
             and status_mem["out_door_temperature"] + 20
             >= status["out_door_temperature"]
         ):
-
             ac_log = AC_LOG(**status)
             if debug:
                 print(f"AC log: {status}")
@@ -180,7 +238,6 @@ def main(
     solar_logger_triger_value: str,
     power_logger_trigger_value: str,
 ):
-
     ac = AC(address=address, token=token, key=key)
     solar = SOLAR(location_id=location_id, solar_api_key=solar_api_key)
 
