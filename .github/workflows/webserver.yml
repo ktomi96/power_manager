@@ -4,9 +4,7 @@ name: Build webserver
 on:
   push:
     branches: ["master"]
-    branches: ["master"]
   pull_request:
-    branches: ["master"]
     branches: ["master"]
 # permissions are needed if pushing to ghcr.io
 jobs:
