@@ -150,7 +150,6 @@ dmypy.json
 
 #frontend build files
 /src/frontend/build/
-/src/frontend/public/
 
 #node module
 /src/frontend/node_modules/
