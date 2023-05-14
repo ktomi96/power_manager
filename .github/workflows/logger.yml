@@ -1,13 +1,12 @@
 name: Build logger
 
-# Controls when the workflow will run
 on:
   push:
     branches: ["master"]
   pull_request:
     branches: ["master"]
     types: [closed]
-        conditions:
+    conditions:
       - ${{ github.event.pull_request.merged == true }}
       - ${{ github.event.pull_request.base.ref == 'master' }}
       - ${{ github.event.pull_request.draft == false }}
