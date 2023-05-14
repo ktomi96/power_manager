@@ -1,23 +1,28 @@
 #!/usr/bin/env python
-try:
-    import os
-    import requests
-    import glob
-    from datetime import date, timedelta, datetime
+import os
+import requests
+import glob
+from datetime import date, timedelta, datetime
 
-    from flask import Flask, redirect, request, url_for, render_template, escape, flash, session, jsonify
-    from livereload import Server, shell
-    import dotenv
-    import pandas as pd
+from flask import (
+    Flask,
+    redirect,
+    request,
+    url_for,
+    render_template,
+    escape,
+    flash,
+    session,
+    jsonify,
+)
+import dotenv
+import pandas as pd
 
-    from forms import AC_login_setup
-    from plotter import ac_plotter, solar_plotter
-    from migrate_csv_to_sql import migrate_to_database
-except ImportError:
-    print("Exited with import error")
-    sys.exit(1)
+from forms import AC_login_setup
+from plotter import ac_plotter, solar_plotter
+from migrate_csv_to_sql import migrate_to_database
 
-env_path = ("./env/")
+env_path = "./env/"
 env_file = f"{env_path}.env"
 dotenv.find_dotenv(env_file, raise_error_if_not_found=True)
 
@@ -26,12 +31,16 @@ logs_dir = ["ac", "solar"]
 logs_path = os.getenv("LOG_PATH")
 db_path = os.getenv("DB_PATH")
 db_url = f"{os.getenv('DB')}{db_path}"
-debug = (os.getenv("DEBUG") == "True")
+debug = os.getenv("DEBUG") == "True"
 
-app = Flask(__name__, template_folder="templates/")
+app = Flask(
+    __name__,
+    static_folder="../src/frontend/build/",
+    static_url_path="/",
+)
 
 SECRET_KEY = os.urandom(32)
-app.config['SECRET_KEY'] = SECRET_KEY
+app.config["SECRET_KEY"] = SECRET_KEY
 
 
 def is_config():
@@ -54,39 +63,34 @@ def set_dotenv_ac(request):
     request_dict.pop("submit")
 
     for key, value in request_dict.items():
-        dotenv.set_key(env_file, key,
-                       value)
+        dotenv.set_key(env_file, key, value)
 
 
 @app.route("/")
 def home():
-    if not is_config() or not is_database():
-        return redirect(url_for("setup_page"))
+    return app.send_static_file("index.html")
 
-    today = datetime.utcnow().date()
-    today_str = today.strftime("%Y-%m-%d")
 
-    now = datetime.utcnow()
-    now_str = now.strftime("%Y-%m-%d %H:%M:%S")
+@app.route("/ac", methods=["GET"])
+def get_ac_plot():
+    start_date = request.args.get("start_date", default=None, type=str)
+    end_date = request.args.get("end_date", default=None, type=str)
+    if ((start_date or end_date)) is None:
+        return {"error": 404}
 
-    month_first_day = (now.replace(day=1))
-    month_first_day_str = month_first_day.strftime("%Y-%m-%d")
+    ac_data = ac_plotter([start_date, end_date])
+    return ac_data if ac_data is not None else jsonify(None)
 
-    yesterday = (today - timedelta(days=1))
-    yesterday_str = yesterday.strftime("%Y-%m-%d")
 
-    after_solar_log = now.replace(hour=23, minute=00)
+@app.route("/solar", methods=["GET"])
+def get_solar_plot():
+    start_date = request.args.get("start_date", default=None, type=str)
+    end_date = request.args.get("end_date", default=None, type=str)
+    if ((start_date or end_date)) is None:
+        return {"error": 404}
 
-    if now < after_solar_log:
-        yesterday_str = now_str
-
-    if debug:
-        print(f"AC plot date: {today_str}")
-        print(f"Solar plot From: {month_first_day_str}, To: {yesterday_str}")
-    ac_fig = ac_plotter([today_str, now_str])
-    solar_fig = solar_plotter([month_first_day_str, yesterday_str])
-
-    return render_template("home.html", ac_fig=ac_fig, solar_fig=solar_fig)
+    solar_data = solar_plotter([start_date, end_date])
+    return solar_data if solar_data is not None else jsonify(None)
 
 
 @app.route("/setup", methods=["GET", "POST"])
@@ -106,16 +110,9 @@ def setup_page():
 
 @app.route("/ping", methods=["GET"])
 def is_webserver_running():
-    if not is_config() or not is_database():
-        return redirect(url_for("setup_page"))
-
-    response = {"is_webserver_running": True}
-    return jsonify(response)
+    return {"is_webserver_running": True}
 
 
 init_dotenv()
 if __name__ == "__main__":
-
-    server = Server(app.wsgi_app)
-    server.watch(env_file)
-    server.serve(host="localhost", port=5000)
+    app.run(host="localhost", port=5000)

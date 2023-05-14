@@ -69,7 +69,6 @@ def solar_plot(df):
 
 @cached(ttl=60)
 def ac_plotter(range_to_plot: list):
-
     if date_time_validator(range_to_plot) != True:
         return None
 
@@ -77,7 +76,7 @@ def ac_plotter(range_to_plot: list):
         ac_df = query_to_df(db_url, AC_LOG, range_to_plot[0], range_to_plot[1])
         if debug:
             print(ac_df)
-        return None if ac_df.empty else ac_plot(ac_df)
+        return None if ac_df.empty else ac_df.to_json(orient="records")
 
     except ValueError:
         return None
@@ -92,7 +91,11 @@ def solar_plotter(range_to_plot: list):
         solar_df["date_time"] = solar_df["date_time"].dt.strftime("%Y-%m-%d")
         if debug:
             print(solar_df)
-        return None if solar_df.empty else solar_plot(solar_df)
+        return (
+            None
+            if solar_df.empty
+            else solar_df.to_json(orient="records")
+        )
     except ValueError:
         return None
 
@@ -117,7 +120,6 @@ def date_time_validator(dates: str):
 
 
 if __name__ == "__main__":
-
     # df = pd.concat(df_list, ignore_index=True)
     # ac_plot(df)
     # path = "./logs/solar"
