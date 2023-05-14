@@ -11,7 +11,6 @@ midea-beautiful-air = "^0.9.15"
 autopep8 = "^2.0.1"
 python-dotenv = "^0.21.0"
 flask = "^2.2.2"
-livereload = "^2.6.3"
 jinja2 = "^3.1.2"
 flask-wtf = "^1.0.1"
 apscheduler = "^3.9.1.post1"
@@ -22,6 +21,8 @@ memoization = "^0.4.0"
 sqlalchemy = "1.4.46"
 mvm-smart-metering = "^0.0.13"
 gunicorn = "^20.1.0"
+connexion = {extras = ["swagger-ui"], version = "^2.14.2"}
+flask-cors = "^3.0.10"
 
 
 [build-system]
