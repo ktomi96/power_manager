@@ -39,8 +39,8 @@ function App() {
   const [solarDateRange, setSolarDateRange] = useState<
     [Date | null, Date | null]
   >([
-    new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-    new Date(Date.now() - 24 * 60 * 60 * 1000),
+    new Date(new Date().getFullYear(), new Date().getMonth(), 2),
+    new Date(Date.now() + 24 * 60 * 60 * 1000),
   ]); // Set default start date as the first day of the month and end date as yesterday for solar data
   const [acDateRange, setAcDateRange] = useState<[Date | null, Date | null]>([
     new Date(),

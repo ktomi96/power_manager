@@ -15,6 +15,7 @@ from sqlalchemy import (
     select,
     func,
     inspect,
+    exc,
 )
 from sqlalchemy.orm import sessionmaker, declarative_base, Session
 import pandas
@@ -125,20 +126,25 @@ def query_last_row(db_url, obj):
 
 
 def query_to_df(db_url, obj, date_from: str, date_to: str):
-    engine = create_engine(db_url, echo=False, future=False)
-    with Session(engine) as session:
-        query_data = (
-            session.query(obj)
-            .filter(obj.date_time.between(date_from, date_to))
-            .order_by(obj.date_time.asc())
-        )
+    try:
+        engine = create_engine(db_url, echo=False, future=False)
+        with Session(engine) as session:
+            query_data = (
+                session.query(obj)
+                .filter(obj.date_time.between(date_from, date_to))
+                .order_by(obj.date_time.asc())
+            )
 
-    df = pandas.read_sql_query(sql=query_data.statement.compile(engine), con=engine)
-    df["date_time"] = pandas.to_datetime(df["date_time"])
-    df["date_time"] = df["date_time"].dt.tz_localize("UTC")
-    df["date_time"] = df["date_time"].dt.tz_convert(time_zone)
+        df = pandas.read_sql_query(sql=query_data.statement.compile(engine), con=engine)
+        df["date_time"] = pandas.to_datetime(df["date_time"])
+        df["date_time"] = df["date_time"].dt.tz_localize("UTC")
+        df["date_time"] = df["date_time"].dt.tz_convert(time_zone)
 
-    return df
+        return df
+
+    except exc.ArgumentError as e:
+        print("ArgumentError occurred:", e)
+        return None
 
 
 def is_table_exists(db_url: str, table_name: str):

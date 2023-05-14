@@ -49,41 +49,41 @@ function ACPlot({ acJson }: ACPlotProps) {
     {
       x: acDateMod,
       y: filteredAcJson.map((x) => x.indoor_temperature),
-      type: 'scatter',
-      name: 'Trace 1',
-      yaxis: 'y1',
+      type: "scatter",
+      name: "Indoor temperature",
+      yaxis: "y1",
     },
     {
       x: acDateMod,
       y: filteredAcJson.map((x) => x.out_door_temperature),
-      type: 'scatter',
-      name: 'Trace 2',
-      yaxis: 'y1',
+      type: "scatter",
+      name: "Outdoor temperature",
+      yaxis: "y1",
     },
     {
       x: acDateMod,
-      y: filteredAcJson.map((x) => (x.running ? 'Running' : 'Not Running')),
-      type: 'scatter',
-      name: 'Trace 3',
-      yaxis: 'y2',
+      y: filteredAcJson.map((x) => (x.running ? "Running" : "Not Running")),
+      type: "scatter",
+      name: "AC status",
+      yaxis: "y2",
     },
   ];
 
   const acLayout: Partial<Layout> = {
-    template: 'plotly_white' as Template,
+    template: "plotly_white" as Template,
     width: 800,
     height: 400,
-    title: 'AC Plot',
+    title: "AC Plot",
     xaxis: {
       showticklabels: false,
     },
     yaxis: {
-      side: 'left',
+      side: "left",
       showgrid: false,
     },
     yaxis2: {
-      side: 'right',
-      overlaying: 'y',
+      side: "right",
+      overlaying: "y",
       showgrid: false,
     },
   };

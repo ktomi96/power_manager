@@ -78,7 +78,8 @@ def ac_plotter(range_to_plot: list):
             print(ac_df)
         return None if ac_df.empty else ac_df.to_json(orient="records")
 
-    except ValueError:
+    except (TypeError, AttributeError, ValueError) as e:
+        print("An error occurred:", e)
         return None
 
 
@@ -91,12 +92,9 @@ def solar_plotter(range_to_plot: list):
         solar_df["date_time"] = solar_df["date_time"].dt.strftime("%Y-%m-%d")
         if debug:
             print(solar_df)
-        return (
-            None
-            if solar_df.empty
-            else solar_df.to_json(orient="records")
-        )
-    except ValueError:
+        return None if solar_df.empty else solar_df.to_json(orient="records")
+    except (TypeError, AttributeError, ValueError) as e:
+        print("An error occurred:", e)
         return None
 
 
