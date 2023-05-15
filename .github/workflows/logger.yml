@@ -4,12 +4,12 @@ on:
   push:
     branches: ["master"]
   pull_request:
+    branches: ["master"]
     types: [closed]
 
 jobs:
   publish-docker-image:
     name: Publish Docker image
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
 
@@ -56,4 +56,3 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
