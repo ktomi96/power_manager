@@ -1,6 +1,7 @@
 import glob
 import os
 import json
+from datetime import datetime, timedelta
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -73,6 +74,9 @@ def ac_plotter(range_to_plot: list):
         return None
 
     try:
+        range_to_plot[1] = (
+            datetime.strptime(range_to_plot[1], "%Y-%m-%d") + timedelta(days=1)
+        ).strftime("%Y-%m-%d")
         ac_df = query_to_df(db_url, AC_LOG, range_to_plot[0], range_to_plot[1])
         if debug:
             print(ac_df)
@@ -88,6 +92,9 @@ def solar_plotter(range_to_plot: list):
     if date_time_validator(range_to_plot) != True:
         return None
     try:
+        range_to_plot[1] = (
+            datetime.strptime(range_to_plot[1], "%Y-%m-%d") + timedelta(days=1)
+        ).strftime("%Y-%m-%d")
         solar_df = query_to_df(db_url, SOLAR_LOG, range_to_plot[0], range_to_plot[1])
         solar_df["date_time"] = solar_df["date_time"].dt.strftime("%Y-%m-%d")
         if debug:
