@@ -24,9 +24,7 @@ function useChartData(fetchUrl: string, dateRange: [Date | null, Date | null]) {
         `${fetchUrl}?start_date=${formattedStartDate}&end_date=${formattedEndDate}`
       )
         .then((res) => res.json())
-        .then((json) => {
-          setChartData(json);
-        });
+        .then(setChartData);
     } else {
       setChartData([]);
     }
