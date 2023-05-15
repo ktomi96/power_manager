@@ -81,6 +81,14 @@ function App() {
               endDate={solarDateRange[1]}
               onChange={handleSolarDateChange}
             />
+            <p>Select date for AC graph</p>
+            <DatePicker
+              selectsRange={true}
+              dateFormat="yyyy/MM/dd"
+              startDate={acDateRange[0]}
+              endDate={acDateRange[1]}
+              onChange={handleACDateChange}
+            />
           </div>
           <button
             className="btn btn-secondary"
@@ -93,18 +101,8 @@ function App() {
             Reset
           </button>
         </div>
-        <div>
-          <SolarPlot solarJson={solarJson} />
-        </div>
       </div>
-      <p>Select date for AC graph</p>
-      <DatePicker
-        selectsRange={true}
-        dateFormat="yyyy/MM/dd"
-        startDate={acDateRange[0]}
-        endDate={acDateRange[1]}
-        onChange={handleACDateChange}
-      />
+      <SolarPlot solarJson={solarJson} />
       <ACPlot acJson={acJson} />
     </div>
   );
