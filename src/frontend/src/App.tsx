@@ -24,9 +24,7 @@ function useChartData(fetchUrl: string, dateRange: [Date | null, Date | null]) {
         `${fetchUrl}?start_date=${formattedStartDate}&end_date=${formattedEndDate}`
       )
         .then((res) => res.json())
-        .then((json) => {
-          setChartData(json);
-        });
+        .then(setChartData);
     } else {
       setChartData([]);
     }
@@ -52,14 +50,6 @@ function App() {
   const solarJson = useChartData("/solar", solarDateRange);
   const acJson = useChartData("/ac", acDateRange);
 
-  const handleSolarDateChange = (update: [Date | null, Date | null]) => {
-    setSolarDateRange(update);
-  };
-
-  const handleACDateChange = (update: [Date | null, Date | null]) => {
-    setAcDateRange(update);
-  };
-
   return (
     <div className="row p-4">
       <div
@@ -79,7 +69,7 @@ function App() {
               dateFormat="yyyy/MM/dd"
               startDate={solarDateRange[0]}
               endDate={solarDateRange[1]}
-              onChange={handleSolarDateChange}
+              onChange={setSolarDateRange}
             />
             <p>Select date for AC graph</p>
             <DatePicker
@@ -87,7 +77,7 @@ function App() {
               dateFormat="yyyy/MM/dd"
               startDate={acDateRange[0]}
               endDate={acDateRange[1]}
-              onChange={handleACDateChange}
+              onChange={setAcDateRange}
             />
           </div>
           <button
