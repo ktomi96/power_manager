@@ -13,7 +13,27 @@ function formatDateToString(date: Date | null): string {
   }
   return moment(date).format("YYYY-MM-DD");
 }
+function useSumSolarData(fetchUrl: string, dateRange: [Date | null, Date | null]) {
+  const [sumSolarData, setSumSolarData] = useState<number>(0);
 
+  useEffect(() => {
+    const [startDate, endDate] = dateRange;
+    const formattedStartDate = formatDateToString(startDate);
+    const formattedEndDate = formatDateToString(endDate);
+
+    if (formattedStartDate && formattedEndDate) {
+      fetch(
+        `${fetchUrl}?start_date=${formattedStartDate}&end_date=${formattedEndDate}`
+      )
+        .then((res) => res.json())
+        .then((res) => setSumSolarData(res.reduce((sum: number, entry: any) => sum+entry["power_generated"], 0)));
+    } else {
+      setSumSolarData(0)
+    }
+  }, [fetchUrl, dateRange]);
+
+  return sumSolarData/1000;
+}
 function useChartData(fetchUrl: string, dateRange: [Date | null, Date | null]) {
   const [chartData, setChartData] = useState<[]>([]);
 
@@ -51,6 +71,7 @@ function App() {
   ]); // Set default start date as today and end date as tomorrow for AC data
 
   const solarJson = useChartData("/solar", solarDateRange);
+  const totalSolar = useSumSolarData("/solar", solarDateRange);
   const acJson = useChartData("/ac", acDateRange);
 
   return (
@@ -95,7 +116,8 @@ function App() {
             </Button>
           </Grid>
           <Grid item xs={12}>
-            <SolarPlot solarJson={solarJson} />
+  		<div>Total Solar power: {totalSolar}</div>
+          <SolarPlot solarJson={solarJson} />
           </Grid>
         </Grid>
       </Grid>
