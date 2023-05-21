@@ -1,6 +1,11 @@
-import { Template } from 'plotly.js';
-import { Data, Layout } from 'plotly.js';
-import Plot from 'react-plotly.js';
+import { Line } from 'react-chartjs-2';
+import { ChartData, Chart as ChartJS, ChartOptions, Legend, Title, Tooltip } from 'chart.js/auto';
+
+ChartJS.register(
+  Title,
+  Tooltip,
+  Legend
+);
 
 export interface ac {
   id: number;
@@ -45,50 +50,102 @@ function ACPlot({ acJson }: ACPlotProps) {
     return date.toLocaleString();
   });
 
-  const acData: Data[] = [
-    {
-      x: acDateMod,
-      y: filteredAcJson.map((x) => x.indoor_temperature),
-      type: "scatter",
-      name: "Indoor temperature",
-      yaxis: "y1",
-    },
-    {
-      x: acDateMod,
-      y: filteredAcJson.map((x) => x.out_door_temperature),
-      type: "scatter",
-      name: "Outdoor temperature",
-      yaxis: "y1",
-    },
-    {
-      x: acDateMod,
-      y: filteredAcJson.map((x) => (x.running ? "Running" : "Not Running")),
-      type: "scatter",
-      name: "AC status",
-      yaxis: "y2",
-    },
-  ];
+  const acData: ChartData<'line', number[], string> = {
+    labels: acDateMod,
+    datasets: [
+      {
+        label: 'Indoor temperature',
+        data: filteredAcJson.map((x) => x.indoor_temperature),
+        fill: false,
+        yAxisID: 'y',
+      },
+      {
+        label: 'Outdoor temperature',
+        data: filteredAcJson.map((x) => x.out_door_temperature),
+        fill: false,
+        yAxisID: 'y',
+      },
+      {
+        label: 'AC status',
+        data: filteredAcJson.map((x) => (x.running ? 1 : 0)),
+        fill: false,
+        yAxisID: 'y1',
+      },
+    ],
+  };
 
-  const acLayout: Partial<Layout> = {
-    template: "plotly_white" as Template,
-    width: 800,
-    height: 400,
-    title: "AC Plot",
-    xaxis: {
-      showticklabels: false,
+  const acOptions: ChartOptions<'line'> = {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: {
+        position: 'right',
+        align: 'center',
+        display: true,
+        labels: {
+          usePointStyle: true,
+          boxWidth: 10,
+          padding: 20,
+        },
+      },
+      title: {
+        display: true,
+        text: 'AC Plot',
+      },
     },
-    yaxis: {
-      side: "left",
-      showgrid: false,
+    layout: {
+      padding: {
+        left: 0,
+        right: 0,
+        top: 10,
+        bottom: 0,
+      },
     },
-    yaxis2: {
-      side: "right",
-      overlaying: "y",
-      showgrid: false,
+    scales: {
+      x: {
+        display: true,
+        type: 'category',
+        ticks: {
+          display: false,
+        },
+        grid: {
+          display: false,
+        },
+      },
+      y: {
+        display: true,
+        grid: {
+          display: false,
+        },
+        ticks: {
+          display: true,
+        }
+      },
+      y1: {
+        display: true,
+        grid: {
+          display: false,
+        },
+        ticks: {
+          display: false,}
+
+      },
+    },
+    elements: {
+      point: {
+        radius: 0,
+      },
+    },
+    interaction: {
+      mode: 'index',
+      intersect: false,
+    },
+    animation: {
+      duration: 0,
     },
   };
 
-  return <Plot data={acData} layout={acLayout} />;
+  return <Line data={acData} options={acOptions} />;
 }
 
 export default ACPlot;
