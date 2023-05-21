@@ -1,7 +1,7 @@
 import DatePicker from "react-datepicker";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { Grid } from "@mui/material";
+import { Card, Grid } from "@mui/material";
 import ACPlot from "./acplot";
 import SolarPlot from "./solarplot";
 import "react-datepicker/dist/react-datepicker.css";
@@ -57,54 +57,59 @@ function App() {
       direction="row"
       justifyContent="flex-start"
       alignItems="flex-start"
-      spacing={2}
+      spacing={{ xs: 12, sm: 8, md: 4 }}
       columns={{ xs: 4, sm: 8, md: 12 }}
     >
       <Grid item xs={12}>
         <h1>Solar and AC data</h1>
       </Grid>
-      <Grid item xs={6} sm={2}>
-        <p>Select date for Solar graph</p>
-      </Grid>
-      <Grid item xs={6} sm={3}>
-        <DatePicker
-          selectsRange={true}
-          dateFormat="yyyy/MM/dd"
-          startDate={solarDateRange[0]}
-          endDate={solarDateRange[1]}
-          onChange={setSolarDateRange}
-        />
-      </Grid>
-      <Grid item xs={6} sm={2}>
-        <p>Select date for AC graph</p>
-      </Grid>
-      <Grid item xs={6} sm={3}>
-        <DatePicker
-          selectsRange={true}
-          dateFormat="yyyy/MM/dd"
-          startDate={acDateRange[0]}
-          endDate={acDateRange[1]}
-          onChange={setAcDateRange}
-        />
-      </Grid>
-      <Grid item xs={12} sm={2}>
-        <button
-          className="btn btn-secondary"
-          onClick={() => {
-            setSolarDateRange([lastMonth, yesterdayDate]); // Reset start date as the first day of the month and end date as yesterday for solar data
 
-            setAcDateRange([todayDate, todayDate]); // Reset start date as today and end date as tomorrow for AC data
-          }}
-        >
-          Reset
-        </button>
-      </Grid>
       <Grid item xs={12} sm={6}>
-        <SolarPlot solarJson={solarJson} />
+
+          <p>Select date for Solar graph</p>
+          <DatePicker
+            selectsRange={true}
+            dateFormat="yyyy/MM/dd"
+            startDate={solarDateRange[0]}
+            endDate={solarDateRange[1]}
+            onChange={setSolarDateRange}
+          />
+          <button
+            className="btn btn-secondary"
+            onClick={() => {
+              setSolarDateRange([lastMonth, yesterdayDate]); // Reset start date as the first day of the month and end date as yesterday for solar data
+
+              setAcDateRange([todayDate, todayDate]); // Reset start date as today and end date as tomorrow for AC data
+            }}
+          >
+            Reset
+          </button>
+          <SolarPlot solarJson={solarJson} />
+
       </Grid>
 
       <Grid item xs={12} sm={6}>
-        <ACPlot acJson={acJson} />
+
+          <p>Select date for AC graph</p>
+          <DatePicker
+            selectsRange={true}
+            dateFormat="yyyy/MM/dd"
+            startDate={acDateRange[0]}
+            endDate={acDateRange[1]}
+            onChange={setAcDateRange}
+          />
+          <button
+            className="btn btn-secondary"
+            onClick={() => {
+              setSolarDateRange([lastMonth, yesterdayDate]); // Reset start date as the first day of the month and end date as yesterday for solar data
+
+              setAcDateRange([todayDate, todayDate]); // Reset start date as today and end date as tomorrow for AC data
+            }}
+          >
+            Reset
+          </button>
+          <ACPlot acJson={acJson} />
+
       </Grid>
     </Grid>
   );
