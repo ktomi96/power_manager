@@ -1,1 +1,9 @@
 *.env
+
+
+/src/frontend/build/
+
+/src/frontend/node_modules/
+*.yml
+/src/frontend/.yarn/
+/app/src/frontend/.yarnrc.yml

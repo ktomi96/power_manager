@@ -153,3 +153,6 @@ dmypy.json
 
 #node module
 /src/frontend/node_modules/
+
+/src/frontend/.yarn/
+.yarnrc.yml
