@@ -17,7 +17,7 @@ COPY ./src/ /app/src/
 
 WORKDIR /app/src/frontend/
 
-RUN yarn install && yarn build
+RUN yarn install --registry=https://registry.yarnpkg.com && yarn build
 
 WORKDIR /app
 
