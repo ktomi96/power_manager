@@ -2,7 +2,7 @@ import DatePicker from "react-datepicker";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { Grid, Button } from "@mui/material";
-import SendIcon from '@mui/icons-material/Send';
+import SendIcon from "@mui/icons-material/Send";
 import ACPlot from "./acplot";
 import SolarPlot from "./solarplot";
 import "react-datepicker/dist/react-datepicker.css";
@@ -13,7 +13,30 @@ function formatDateToString(date: Date | null): string {
   }
   return moment(date).format("YYYY-MM-DD");
 }
+function useSumSolarData(
+  fetchUrl: string,
+  dateRange: [Date | null, Date | null]
+) {
+  const [sumSolarData, setSumSolarData] = useState<number>(0);
 
+  useEffect(() => {
+    const [startDate, endDate] = dateRange;
+    const formattedStartDate = formatDateToString(startDate);
+    const formattedEndDate = formatDateToString(endDate);
+
+    if (formattedStartDate && formattedEndDate) {
+      fetch(
+        `${fetchUrl}?start_date=${formattedStartDate}&end_date=${formattedEndDate}`
+      )
+        .then((res) => res.json())
+        .then(setSumSolarData);
+    } else {
+      setSumSolarData(0);
+    }
+  }, [fetchUrl, dateRange]);
+
+  return sumSolarData / 1000;
+}
 function useChartData(fetchUrl: string, dateRange: [Date | null, Date | null]) {
   const [chartData, setChartData] = useState<[]>([]);
 
@@ -51,6 +74,13 @@ function App() {
   ]); // Set default start date as today and end date as tomorrow for AC data
 
   const solarJson = useChartData("/solar", solarDateRange);
+  const totalSolar = () => {
+    const solarSum = useSumSolarData("/solar_sum", solarDateRange);
+    if (solarSum > 1000) {
+      return `${(solarSum / 1000).toFixed(2)} MWh`;
+    }
+    return `${(solarSum).toFixed(2)} kWh`;
+  };
   const acJson = useChartData("/ac", acDateRange);
 
   return (
@@ -64,7 +94,9 @@ function App() {
       <Grid item xs={12}>
         <h1>Solar and AC data</h1>
       </Grid>
-
+      <Grid item xs={12}>
+        <div>Total Solar power: {totalSolar()}</div>
+      </Grid>
       <Grid item xs={12} sm={6}>
         <Grid
           container

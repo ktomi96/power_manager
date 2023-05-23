@@ -147,6 +147,11 @@ def query_to_df(db_url, obj, date_from: str, date_to: str):
         return None
 
 
+def query_to_df_agr(db_url, obj, to_agr, date_from: str, date_to: str):
+    df = query_to_df(db_url, obj, date_from, date_to)
+    return df[to_agr].agg(["sum"])
+
+
 def is_table_exists(db_url: str, table_name: str):
     engine = create_engine(db_url, echo=False, future=False)
     inspector = inspect(engine)
