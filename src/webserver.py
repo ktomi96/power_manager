@@ -19,7 +19,7 @@ import dotenv
 import pandas as pd
 
 from forms import AC_login_setup
-from plotter import ac_plotter, solar_plotter
+from plotter import ac_plotter, solar_plotter, solar_produce_agr
 from migrate_csv_to_sql import migrate_to_database
 
 env_path = "./env/"
@@ -91,6 +91,17 @@ def get_solar_plot():
 
     solar_data = solar_plotter([start_date, end_date])
     return solar_data if solar_data is not None else jsonify(None)
+
+
+@app.route("/solar_sum", methods=["GET"])
+def get_solar_agr():
+    start_date = request.args.get("start_date", default=None, type=str)
+    end_date = request.args.get("end_date", default=None, type=str)
+    if ((start_date or end_date)) is None:
+        return {"error": 404}
+
+    solar_data = solar_produce_agr([start_date, end_date])
+    return jsonify(solar_data) if solar_data is not None else jsonify(None)
 
 
 @app.route("/setup", methods=["GET", "POST"])

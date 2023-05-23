@@ -14,7 +14,7 @@ from memoization import cached
 import dotenv
 
 # internal import
-from database import AC_LOG, SOLAR_LOG, query_to_df
+from database import AC_LOG, SOLAR_LOG, query_to_df, query_to_df_agr
 
 env_path = "./env/"
 env_file = f"{env_path}.env"
@@ -105,6 +105,25 @@ def solar_plotter(range_to_plot: list):
         return None
 
 
+@cached(ttl=60)
+def solar_produce_agr(range_to_agr: list):
+    if date_time_validator(range_to_agr) != True:
+        return None
+    try:
+        range_to_agr[1] = (
+            datetime.strptime(range_to_agr[1], "%Y-%m-%d") + timedelta(days=1)
+        ).strftime("%Y-%m-%d")
+        solar_df = query_to_df_agr(
+            db_url, SOLAR_LOG, "power_generated", range_to_agr[0], range_to_agr[1]
+        )
+        if debug:
+            print(solar_df)
+        return None if solar_df.empty else solar_df["sum"]
+    except (TypeError, AttributeError, ValueError) as e:
+        print("An error occurred:", e)
+        return None
+
+
 def merge_csv(folder, filename):
     csv_files = glob.glob(f"{folder}{filename}")
     df_list = (pd.read_csv(file) for file in csv_files)
@@ -128,4 +147,4 @@ if __name__ == "__main__":
     # df = pd.concat(df_list, ignore_index=True)
     # ac_plot(df)
     # path = "./logs/solar"
-    solar_plotter(["2023-01-30", "2023-01-30"])
+    solar_produce(["2023-01-30", "2023-01-30"])
