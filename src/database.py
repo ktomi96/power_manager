@@ -125,7 +125,14 @@ def query_last_row(db_url, obj):
         return session.query(obj).order_by(obj.id.desc()).first()
 
 def calculate_date_time_scale(date_from: str, date_to: str):
-    return '1T'
+    d0 = pandas.to_datetime(date_from)
+    d1 = pandas.to_datetime(date_to)
+    delta = d1 - d0
+    if delta.days == 1:
+       return '1T'
+    elif delta.days > 15:
+       return '1D'
+    return '1H'
 
 def ac_query_to_df(db_url, obj, date_from: str, date_to: str):
     df = query_to_df(db_url, obj, date_from, date_to)
