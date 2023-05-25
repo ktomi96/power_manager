@@ -124,6 +124,25 @@ def query_last_row(db_url, obj):
         """
         return session.query(obj).order_by(obj.id.desc()).first()
 
+def calculate_date_time_scale(date_from: str, date_to: str):
+    d0 = pandas.to_datetime(date_from)
+    d1 = pandas.to_datetime(date_to)
+    delta = d1 - d0
+    if delta.days == 1:
+       return '1T'
+    elif delta.days > 15:
+       return '1D'
+    return '1H'
+
+def ac_query_to_df(db_url, obj, date_from: str, date_to: str):
+    df = query_to_df(db_url, obj, date_from, date_to)
+    agg_indoor = pandas.NamedAgg(column="indoor_temperature", aggfunc='max')
+    agg_outdoor = pandas.NamedAgg(column="out_door_temperature", aggfunc='mean')
+    agg_running = pandas.NamedAgg(column="running", aggfunc='mean')
+    agg_date_time = pandas.NamedAgg(column="date_time", aggfunc='max')
+    df = df.groupby(pandas.Grouper(key='date_time', freq=calculate_date_time_scale(date_from, date_to))).agg(indoor_temperature=agg_indoor, out_door_temperature=agg_outdoor, running=agg_running, date_time=agg_date_time)
+
+    return df
 
 def query_to_df(db_url, obj, date_from: str, date_to: str):
     try:
