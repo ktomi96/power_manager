@@ -14,7 +14,7 @@ from memoization import cached
 import dotenv
 
 # internal import
-from database import AC_LOG, SOLAR_LOG, query_to_df, query_to_df_agr
+from database import AC_LOG, SOLAR_LOG, query_to_df, ac_query_to_df, query_to_df_agr
 
 env_path = "./env/"
 env_file = f"{env_path}.env"
@@ -77,7 +77,7 @@ def ac_plotter(range_to_plot: list):
         range_to_plot[1] = (
             datetime.strptime(range_to_plot[1], "%Y-%m-%d") + timedelta(days=1)
         ).strftime("%Y-%m-%d")
-        ac_df = query_to_df(db_url, AC_LOG, range_to_plot[0], range_to_plot[1])
+        ac_df = ac_query_to_df(db_url, AC_LOG, range_to_plot[0], range_to_plot[1])
         if debug:
             print(ac_df)
         return None if ac_df.empty else ac_df.to_json(orient="records")

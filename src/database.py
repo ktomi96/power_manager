@@ -124,6 +124,10 @@ def query_last_row(db_url, obj):
         """
         return session.query(obj).order_by(obj.id.desc()).first()
 
+def ac_query_to_df(db_url, obj, date_from: str, date_to: str):
+    df = query_to_df(db_url, obj, date_from, date_to)
+
+    return df
 
 def query_to_df(db_url, obj, date_from: str, date_to: str):
     try:
