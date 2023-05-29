@@ -21,6 +21,7 @@ import pandas as pd
 from forms import AC_login_setup
 from plotter import ac_plotter, solar_plotter, solar_produce_agr
 from migrate_csv_to_sql import migrate_to_database
+from ac_handler import ac_status_getter, ac_status_setter
 
 env_path = "./env/"
 env_file = f"{env_path}.env"
@@ -102,6 +103,24 @@ def get_solar_agr():
 
     solar_data = solar_produce_agr([start_date, end_date])
     return jsonify(solar_data) if solar_data is not None else jsonify(None)
+
+
+@app.route("/ac_status", methods=["GET"])
+def ac_status():
+    return ac_status_getter()
+
+
+@app.route("/ac_set", methods=["POST"])
+def ac_set():
+    json_ac_settings = request.get_json()
+    ac_settings = dict(json_ac_settings)
+
+    state = ac_status_setter(ac_settings)
+    if not state:
+        response_data = {"error": "Bad request"}
+        return jsonify(response_data), 400
+
+    return jsonify(state), 200
 
 
 @app.route("/setup", methods=["GET", "POST"])

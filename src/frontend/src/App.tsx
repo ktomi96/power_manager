@@ -1,3 +1,4 @@
+import axios from "axios";
 import DatePicker from "react-datepicker";
 import moment from "moment";
 import { useEffect, useState } from "react";
@@ -5,6 +6,7 @@ import { Grid, Button } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import ACPlot from "./acplot";
 import SolarPlot from "./solarplot";
+import AcSetter from "./acSet";
 import "react-datepicker/dist/react-datepicker.css";
 
 function formatDateToString(date: Date | null): string {
@@ -13,10 +15,8 @@ function formatDateToString(date: Date | null): string {
   }
   return moment(date).format("YYYY-MM-DD");
 }
-function useSumSolarData(
-  fetchUrl: string,
-  dateRange: [Date | null, Date | null]
-) {
+
+function useSumSolarData(fetchUrl: string, dateRange: [Date | null, Date | null]) {
   const [sumSolarData, setSumSolarData] = useState<number>(0);
 
   useEffect(() => {
@@ -25,10 +25,9 @@ function useSumSolarData(
     const formattedEndDate = formatDateToString(endDate);
 
     if (formattedStartDate && formattedEndDate) {
-      fetch(
-        `${fetchUrl}?start_date=${formattedStartDate}&end_date=${formattedEndDate}`
-      )
-        .then((res) => res.json())
+      axios
+        .get(`${fetchUrl}?start_date=${formattedStartDate}&end_date=${formattedEndDate}`)
+        .then((res) => res.data)
         .then(setSumSolarData);
     } else {
       setSumSolarData(0);
@@ -37,6 +36,7 @@ function useSumSolarData(
 
   return sumSolarData / 1000;
 }
+
 function useChartData(fetchUrl: string, dateRange: [Date | null, Date | null]) {
   const [chartData, setChartData] = useState<[]>([]);
 
@@ -46,10 +46,9 @@ function useChartData(fetchUrl: string, dateRange: [Date | null, Date | null]) {
     const formattedEndDate = formatDateToString(endDate);
 
     if (formattedStartDate && formattedEndDate) {
-      fetch(
-        `${fetchUrl}?start_date=${formattedStartDate}&end_date=${formattedEndDate}`
-      )
-        .then((res) => res.json())
+      axios
+        .get(`${fetchUrl}?start_date=${formattedStartDate}&end_date=${formattedEndDate}`)
+        .then((res) => res.data)
         .then(setChartData);
     } else {
       setChartData([]);
@@ -65,13 +64,8 @@ function App() {
   const yesterday = today.subtract(1, "day");
   const yesterdayDate = yesterday.toDate();
   const lastMonth = yesterday.subtract(1, "month").toDate();
-  const [solarDateRange, setSolarDateRange] = useState<
-    [Date | null, Date | null]
-  >([lastMonth, yesterdayDate]); // Set default start date as the first day of the month and end date as yesterday for solar data
-  const [acDateRange, setAcDateRange] = useState<[Date | null, Date | null]>([
-    todayDate,
-    todayDate,
-  ]); // Set default start date as today and end date as tomorrow for AC data
+  const [solarDateRange, setSolarDateRange] = useState<[Date | null, Date | null]>([lastMonth, yesterdayDate]); // Set default start date as the first day of the month and end date as yesterday for solar data
+  const [acDateRange, setAcDateRange] = useState<[Date | null, Date | null]>([todayDate, todayDate]); // Set default start date as today and end date as tomorrow for AC data
 
   const solarJson = useChartData("/solar", solarDateRange);
   const totalSolar = () => {
@@ -79,7 +73,7 @@ function App() {
     if (solarSum > 1000) {
       return `${(solarSum / 1000).toFixed(2)} MWh`;
     }
-    return `${(solarSum).toFixed(2)} kWh`;
+    return `${solarSum.toFixed(2)} kWh`;
   };
   const acJson = useChartData("/ac", acDateRange);
 
@@ -89,15 +83,18 @@ function App() {
       direction="row"
       justifyContent="flex-start"
       alignItems="flex-start"
-      spacing={{ xs: 8, sm: 4, md: 2 }}
+      spacing={2}
     >
       <Grid item xs={12}>
         <h1>Solar and AC data</h1>
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} sm={4}>
         <div>Total Solar power: {totalSolar()}</div>
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={8}>
+      <AcSetter></AcSetter>
+      </Grid>
+    <Grid item xs={12} sm={6}>
         <Grid
           container
           direction="row"
@@ -110,8 +107,7 @@ function App() {
               dateFormat="yyyy/MM/dd"
               startDate={solarDateRange[0]}
               endDate={solarDateRange[1]}
-              onChange={setSolarDateRange}
-            />
+              onChange={setSolarDateRange} />
           </Grid>
           <Grid item xs={4}>
             <Button
@@ -121,7 +117,7 @@ function App() {
               endIcon={<SendIcon />}
               onClick={() => {
                 setSolarDateRange([lastMonth, yesterdayDate]); // Reset start date as the first day of the month and end date as yesterday for solar data
-              }}
+              } }
             >
               Reset
             </Button>
@@ -130,9 +126,7 @@ function App() {
             <SolarPlot solarJson={solarJson} />
           </Grid>
         </Grid>
-      </Grid>
-
-      <Grid item xs={12} sm={6}>
+      </Grid><Grid item xs={12} sm={6}>
         <Grid
           container
           direction="row"
@@ -145,8 +139,7 @@ function App() {
               dateFormat="yyyy/MM/dd"
               startDate={acDateRange[0]}
               endDate={acDateRange[1]}
-              onChange={setAcDateRange}
-            />
+              onChange={setAcDateRange} />
           </Grid>
           <Grid item xs={4}>
             <Button
@@ -156,7 +149,7 @@ function App() {
               endIcon={<SendIcon />}
               onClick={() => {
                 setAcDateRange([todayDate, todayDate]); // Reset start date as today and end date as tomorrow for AC data
-              }}
+              } }
             >
               Reset
             </Button>
