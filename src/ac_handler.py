@@ -37,8 +37,12 @@ def ac_status_setter(ac_settings):
         ac_settings["mode"] = ac.convert_modes(ac_settings.get("mode"))
         ac.set_ac_status(**ac_settings)
         set_status = ac.get_status()
-        return set_status.state.running == ac_settings.get("running")
-        
+
+        if set_status.state.running != ac_settings.get("running"):
+            return False
+
+        return ac_status_getter()
+
     except Exception as esc:
         print(esc, file=sys.stderr)
 
