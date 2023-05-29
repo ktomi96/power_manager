@@ -114,11 +114,13 @@ def ac_status():
 def ac_set():
     json_ac_settings = request.get_json()
     ac_settings = dict(json_ac_settings)
-    print(ac_settings)
-    ac_status_setter(ac_settings)
-    response_data = {"message": "Post successful"}
-    return jsonify(response_data), 200
 
+    if state := ac_status_setter(ac_settings):
+        response_data = {"ac_set": "Post successful"}
+        return jsonify(response_data), 200
+    else:
+        response_data = {"error": "Bad request"}
+        return jsonify(response_data), 400
 
 @app.route("/setup", methods=["GET", "POST"])
 def setup_page():
