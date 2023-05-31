@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import sys
 import requests
 import glob
 from datetime import date, timedelta, datetime
@@ -107,20 +108,27 @@ def get_solar_agr():
 
 @app.route("/ac_status", methods=["GET"])
 def ac_status():
-    return ac_status_getter()
+    try:
+        ac_status = ac_status_getter()
+        return ac_status or {"error": "ac_status"}, 404
+    except Exception as esc:
+        print(esc, file=sys.stderr)
 
 
 @app.route("/ac_set", methods=["POST"])
 def ac_set():
-    json_ac_settings = request.get_json()
-    ac_settings = dict(json_ac_settings)
+    try:
+        json_ac_settings = request.get_json()
+        ac_settings = dict(json_ac_settings)
 
-    state = ac_status_setter(ac_settings)
-    if not state:
-        response_data = {"error": "Bad request"}
-        return jsonify(response_data), 400
+        state = ac_status_setter(ac_settings)
+        if not state:
+            response_data = {"error": "Bad request"}
+            return jsonify(response_data), 400
 
-    return jsonify(state), 200
+        return jsonify(state), 200
+    except Exception as esc:
+        print(esc, file=sys.stderr)
 
 
 @app.route("/setup", methods=["GET", "POST"])
@@ -146,3 +154,4 @@ def is_webserver_running():
 init_dotenv()
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
