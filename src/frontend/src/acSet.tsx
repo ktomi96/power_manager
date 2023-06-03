@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 
 function AcSetter() {
+  let acSetterDisplay = true;
   const [AcModeValue, setAcModeValue] = useState<string>("auto_mode");
 
   const handleAcModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,7 +58,6 @@ function AcSetter() {
       .get("/ac_status")
       .then((response) => {
         const { mode, running, target_temperature } = response.data;
-
         setAcModeValue(mode);
         setAcStateValue(running);
         setAcTemperature(parseInt(target_temperature));
@@ -66,10 +66,9 @@ function AcSetter() {
       .catch((error) => {
         setIsLoading(false);
         console.log(error);
+        acSetterDisplay = false; 
       });
   }, []);
-
-
 
   const setAcApi = () => {
     setIsPosting(true);
@@ -106,8 +105,10 @@ function AcSetter() {
       spacing={2}
     >
       {isLoading ? (
-        <CircularProgress /> // Render CircularProgress if isLoading is true
-      ) : (
+        <Grid item xs={12}>
+          <CircularProgress />
+        </Grid>
+      ) : acSetterDisplay ? (
         <>
           <Grid item xs={12} sm={6}>
             <FormControl>
@@ -188,6 +189,10 @@ function AcSetter() {
             </Button>
           </Grid>
         </>
+      ) : (
+        <Grid item xs={12}>
+          <Typography>Error loading AC data</Typography>
+        </Grid>
       )}
     </Grid>
   );
