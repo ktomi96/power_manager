@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import {
   CircularProgress,
@@ -15,8 +15,8 @@ import {
   FormLabel,
 } from "@mui/material";
 
-function AcSetter() {
-  let acSetterDisplay = true;
+const AcSetter: React.FC = () => {
+  const acSetterDisplay = useRef(true);
   const [AcModeValue, setAcModeValue] = useState<string>("auto_mode");
 
   const handleAcModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,7 +66,7 @@ function AcSetter() {
       .catch((error) => {
         setIsLoading(false);
         console.log(error);
-        acSetterDisplay = false; 
+        acSetterDisplay.current = false;
       });
   }, []);
 
@@ -196,6 +196,6 @@ function AcSetter() {
       )}
     </Grid>
   );
-}
+};
 
 export default AcSetter;

@@ -1,81 +1,48 @@
-import axios from "axios";
+import React from "react";
 import DatePicker from "react-datepicker";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Grid, Button } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import ACPlot from "./acplot";
-import SolarPlot from "./solarplot";
-import AcSetter from "./acSet";
+import ACPlot from "./AcPlot";
+import SolarPlot from "./SolarPlot";
+import AcSetter from "./AcSetter";
 import "react-datepicker/dist/react-datepicker.css";
+import { DateRange } from "./hooks/useChartData";
+import SolarSum from "./SolarSum";
 
-function formatDateToString(date: Date | null): string {
-  if (date === null) {
-    return "";
-  }
-  return moment(date).format("YYYY-MM-DD");
-}
-
-function useSumSolarData(fetchUrl: string, dateRange: [Date | null, Date | null]) {
-  const [sumSolarData, setSumSolarData] = useState<number>(0);
-
-  useEffect(() => {
-    const [startDate, endDate] = dateRange;
-    const formattedStartDate = formatDateToString(startDate);
-    const formattedEndDate = formatDateToString(endDate);
-
-    if (formattedStartDate && formattedEndDate) {
-      axios
-        .get(`${fetchUrl}?start_date=${formattedStartDate}&end_date=${formattedEndDate}`)
-        .then((res) => res.data)
-        .then(setSumSolarData);
-    } else {
-      setSumSolarData(0);
-    }
-  }, [fetchUrl, dateRange]);
-
-  return sumSolarData / 1000;
-}
-
-function useChartData(fetchUrl: string, dateRange: [Date | null, Date | null]) {
-  const [chartData, setChartData] = useState<[]>([]);
-
-  useEffect(() => {
-    const [startDate, endDate] = dateRange;
-    const formattedStartDate = formatDateToString(startDate);
-    const formattedEndDate = formatDateToString(endDate);
-
-    if (formattedStartDate && formattedEndDate) {
-      axios
-        .get(`${fetchUrl}?start_date=${formattedStartDate}&end_date=${formattedEndDate}`)
-        .then((res) => res.data)
-        .then(setChartData);
-    } else {
-      setChartData([]);
-    }
-  }, [fetchUrl, dateRange]);
-
-  return chartData;
-}
-
-function App() {
+const App: React.FC = () => {
   const today = moment();
-  const todayDate = today.toDate();
+  const todayDate: Date = today.toDate();
   const yesterday = today.subtract(1, "day");
   const yesterdayDate = yesterday.toDate();
   const lastMonth = yesterday.subtract(1, "month").toDate();
-  const [solarDateRange, setSolarDateRange] = useState<[Date | null, Date | null]>([lastMonth, yesterdayDate]); // Set default start date as the first day of the month and end date as yesterday for solar data
-  const [acDateRange, setAcDateRange] = useState<[Date | null, Date | null]>([todayDate, todayDate]); // Set default start date as today and end date as tomorrow for AC data
+  // Set default start date as the first day of the month and end date as yesterday for solar data
+  const [solarDateRange, setSolarDateRange] = useState<DateRange>({
+    startDate: lastMonth,
+    endDate: yesterdayDate,
+  });
+  // Set default start date as today and end date as tomorrow for AC data
+  const [acDateRange, setAcDateRange] = useState<DateRange>({
+    startDate: todayDate,
+    endDate: todayDate,
+  });
 
-  const solarJson = useChartData("/solar", solarDateRange);
-  const totalSolar = () => {
-    const solarSum = useSumSolarData("/solar_sum", solarDateRange);
-    if (solarSum > 1000) {
-      return `${(solarSum / 1000).toFixed(2)} MWh`;
-    }
-    return `${solarSum.toFixed(2)} kWh`;
+  const onSolDateChange = (dates: [Date | null, Date | null]) => {
+    const [start, end] = dates;
+    setSolarDateRange({
+      startDate: start,
+      endDate: end,
+    });
   };
-  const acJson = useChartData("/ac", acDateRange);
+
+  const onACDateChange = (dates: [Date | null, Date | null]) => {
+    const [start, end] = dates;
+    setAcDateRange({
+      startDate: start,
+      endDate: end,
+    });
+  };
 
   return (
     <Grid
@@ -89,12 +56,12 @@ function App() {
         <h1>Solar and AC data</h1>
       </Grid>
       <Grid item xs={12} sm={4}>
-        <div>Total Solar power: {totalSolar()}</div>
+        <SolarSum solarDateRange={solarDateRange} />
       </Grid>
       <Grid item xs={12} sm={8}>
-      <AcSetter></AcSetter>
+        <AcSetter />
       </Grid>
-    <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6}>
         <Grid
           container
           direction="row"
@@ -105,9 +72,10 @@ function App() {
             <DatePicker
               selectsRange={true}
               dateFormat="yyyy/MM/dd"
-              startDate={solarDateRange[0]}
-              endDate={solarDateRange[1]}
-              onChange={setSolarDateRange} />
+              startDate={solarDateRange.startDate}
+              endDate={solarDateRange.endDate}
+              onChange={onSolDateChange}
+            />
           </Grid>
           <Grid item xs={4}>
             <Button
@@ -116,17 +84,18 @@ function App() {
               size="small"
               endIcon={<SendIcon />}
               onClick={() => {
-                setSolarDateRange([lastMonth, yesterdayDate]); // Reset start date as the first day of the month and end date as yesterday for solar data
-              } }
+                setSolarDateRange; // Reset start date as the first day of the month and end date as yesterday for solar data
+              }}
             >
               Reset
             </Button>
           </Grid>
           <Grid item xs={12}>
-            <SolarPlot solarJson={solarJson} />
+            <SolarPlot solarDateRange={solarDateRange} />
           </Grid>
         </Grid>
-      </Grid><Grid item xs={12} sm={6}>
+      </Grid>
+      <Grid item xs={12} sm={6}>
         <Grid
           container
           direction="row"
@@ -137,9 +106,10 @@ function App() {
             <DatePicker
               selectsRange={true}
               dateFormat="yyyy/MM/dd"
-              startDate={acDateRange[0]}
-              endDate={acDateRange[1]}
-              onChange={setAcDateRange} />
+              startDate={acDateRange.startDate}
+              endDate={acDateRange.endDate}
+              onChange={onACDateChange}
+            />
           </Grid>
           <Grid item xs={4}>
             <Button
@@ -148,19 +118,22 @@ function App() {
               size="small"
               endIcon={<SendIcon />}
               onClick={() => {
-                setAcDateRange([todayDate, todayDate]); // Reset start date as today and end date as tomorrow for AC data
-              } }
+                setAcDateRange({
+                  startDate: todayDate,
+                  endDate: todayDate,
+                }); // Reset start date as today and end date as tomorrow for AC data
+              }}
             >
               Reset
             </Button>
           </Grid>
           <Grid item xs={12}>
-            <ACPlot acJson={acJson} />
+            <ACPlot acDateRange={acDateRange} />
           </Grid>
         </Grid>
       </Grid>
     </Grid>
   );
-}
+};
 
 export default App;
