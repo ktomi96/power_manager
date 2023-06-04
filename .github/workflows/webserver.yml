@@ -2,7 +2,7 @@ name: Build webserver
 
 on:
   push:
-    branches: ["master", "feature"]
+    branches: ["master"]
   pull_request:
     branches: ["master"]
     types: [closed]
@@ -36,6 +36,9 @@ jobs:
         working-directory: ./src/frontend/
         run: yarn install
 
+      - name: Linting 
+        working-directory: ./src/frontend/
+        run: yarn lint
 
       - name: Build
         working-directory: ./src/frontend/
