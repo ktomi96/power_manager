@@ -1,11 +1,16 @@
-import { Line } from 'react-chartjs-2';
-import { ChartData, Chart as ChartJS, ChartOptions, Legend, Title, Tooltip } from 'chart.js/auto';
-
-ChartJS.register(
+import React from "react";
+import { Line } from "react-chartjs-2";
+import {
+  ChartData,
+  Chart as ChartJS,
+  ChartOptions,
+  Legend,
   Title,
   Tooltip,
-  Legend
-);
+} from "chart.js/auto";
+import { DateRange, useChartData } from "./hooks/useChartData";
+
+ChartJS.register(Title, Tooltip, Legend);
 
 export interface ac {
   id: number;
@@ -14,12 +19,12 @@ export interface ac {
   out_door_temperature: number;
   date_time: string;
 }
-
-interface ACPlotProps {
-  acJson: ac[];
+interface AcPlotProps {
+  acDateRange: DateRange;
 }
 
-function ACPlot({ acJson }: ACPlotProps) {
+const ACPlot: React.FC<AcPlotProps> = ({ acDateRange }) => {
+  const acJson = useChartData<ac>("/ac", acDateRange);
   if (!acJson || acJson.length === 0) {
     return <h1>There is no data for the AC chart</h1>;
   }
@@ -29,8 +34,10 @@ function ACPlot({ acJson }: ACPlotProps) {
     const currIndoorTemp = curr.indoor_temperature;
     const currOutdoorTemp = curr.out_door_temperature;
     if (
-      (!prev || Math.abs(currIndoorTemp - prev.indoor_temperature) > 10) ||
-      (!prev || Math.abs(currOutdoorTemp - prev.out_door_temperature) > 10)
+      !prev ||
+      Math.abs(currIndoorTemp - prev.indoor_temperature) > 10 ||
+      !prev ||
+      Math.abs(currOutdoorTemp - prev.out_door_temperature) > 10
     ) {
       acc.push({
         id: prev?.id ?? curr.id,
@@ -50,37 +57,37 @@ function ACPlot({ acJson }: ACPlotProps) {
     return date.toLocaleString();
   });
 
-  const acData: ChartData<'line', number[], string> = {
+  const acData: ChartData<"line", number[], string> = {
     labels: acDateMod,
     datasets: [
       {
-        label: 'Indoor temperature',
+        label: "Indoor temperature",
         data: filteredAcJson.map((x) => x.indoor_temperature),
         fill: false,
-        yAxisID: 'y',
+        yAxisID: "y",
       },
       {
-        label: 'Outdoor temperature',
+        label: "Outdoor temperature",
         data: filteredAcJson.map((x) => x.out_door_temperature),
         fill: false,
-        yAxisID: 'y',
+        yAxisID: "y",
       },
       {
-        label: 'AC status',
+        label: "AC status",
         data: filteredAcJson.map((x) => (x.running ? 1 : 0)),
         fill: false,
-        yAxisID: 'y1',
+        yAxisID: "y1",
       },
     ],
   };
 
-  const acOptions: ChartOptions<'line'> = {
+  const acOptions: ChartOptions<"line"> = {
     responsive: true,
     maintainAspectRatio: true,
     plugins: {
       legend: {
-        position: 'right',
-        align: 'center',
+        position: "right",
+        align: "center",
         display: true,
         labels: {
           usePointStyle: true,
@@ -90,7 +97,7 @@ function ACPlot({ acJson }: ACPlotProps) {
       },
       title: {
         display: true,
-        text: 'AC Plot',
+        text: "AC Plot",
       },
     },
     layout: {
@@ -104,7 +111,7 @@ function ACPlot({ acJson }: ACPlotProps) {
     scales: {
       x: {
         display: true,
-        type: 'category',
+        type: "category",
         ticks: {
           display: false,
         },
@@ -119,7 +126,7 @@ function ACPlot({ acJson }: ACPlotProps) {
         },
         ticks: {
           display: true,
-        }
+        },
       },
       y1: {
         display: true,
@@ -127,8 +134,8 @@ function ACPlot({ acJson }: ACPlotProps) {
           display: false,
         },
         ticks: {
-          display: false,}
-
+          display: false,
+        },
       },
     },
     elements: {
@@ -137,7 +144,7 @@ function ACPlot({ acJson }: ACPlotProps) {
       },
     },
     interaction: {
-      mode: 'index',
+      mode: "index",
       intersect: false,
     },
     animation: {
@@ -146,6 +153,6 @@ function ACPlot({ acJson }: ACPlotProps) {
   };
 
   return <Line data={acData} options={acOptions} />;
-}
+};
 
 export default ACPlot;

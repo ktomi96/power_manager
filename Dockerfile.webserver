@@ -3,12 +3,8 @@ FROM python:slim-buster
 ENV PYTHONUNBUFFERED=true
 
 RUN apt update && \
-    apt install --no-install-recommends -y curl && \
-    curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs && \
+    apt install --no-install-recommends -y && \
     pip install poetry && \
-    corepack enable && \
-    corepack prepare yarn@stable --activate && \
     apt clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -16,11 +12,20 @@ COPY pyproject.toml poetry.lock ./
 RUN POETRY_VIRTUALENVS_CREATE=false poetry install
 COPY ./src/ /app/src/
 
-WORKDIR /app/src/frontend/
-RUN yarn --version
-RUN yarn install --immutable && yarn build
-
-WORKDIR /app
+ARG ENABLE_FRONTEND=false
+RUN if [ "$ENABLE_FRONTEND" = "true" ]; then \
+      apt install --no-install-recommends -y curl && \
+      curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
+      apt-get install -y nodejs && \
+      corepack enable && \
+      corepack prepare yarn@stable --activate && \
+      apt clean && rm -rf /var/lib/apt/lists/* && \
+      cd /app/src/frontend/ && \
+      yarn --version && \
+      yarn install --immutable && \
+      yarn build && \
+      cd /app; \
+    fi
 
 EXPOSE 5000
 

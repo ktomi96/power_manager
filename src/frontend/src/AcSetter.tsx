@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import {
   CircularProgress,
@@ -15,7 +15,8 @@ import {
   FormLabel,
 } from "@mui/material";
 
-function AcSetter() {
+const AcSetter: React.FC = () => {
+  const acSetterDisplay = useRef(true);
   const [AcModeValue, setAcModeValue] = useState<string>("auto_mode");
 
   const handleAcModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,7 +58,6 @@ function AcSetter() {
       .get("/ac_status")
       .then((response) => {
         const { mode, running, target_temperature } = response.data;
-
         setAcModeValue(mode);
         setAcStateValue(running);
         setAcTemperature(parseInt(target_temperature));
@@ -66,10 +66,9 @@ function AcSetter() {
       .catch((error) => {
         setIsLoading(false);
         console.log(error);
+        acSetterDisplay.current = false;
       });
   }, []);
-
-
 
   const setAcApi = () => {
     setIsPosting(true);
@@ -106,8 +105,10 @@ function AcSetter() {
       spacing={2}
     >
       {isLoading ? (
-        <CircularProgress /> // Render CircularProgress if isLoading is true
-      ) : (
+        <Grid item xs={12}>
+          <CircularProgress />
+        </Grid>
+      ) : acSetterDisplay ? (
         <>
           <Grid item xs={12} sm={6}>
             <FormControl>
@@ -188,9 +189,13 @@ function AcSetter() {
             </Button>
           </Grid>
         </>
+      ) : (
+        <Grid item xs={12}>
+          <Typography>Error loading AC data</Typography>
+        </Grid>
       )}
     </Grid>
   );
-}
+};
 
 export default AcSetter;

@@ -1,6 +1,16 @@
-import { Bar } from 'react-chartjs-2';
-import { ChartData, Chart as ChartJS, ChartOptions, Legend, Title, Tooltip } from 'chart.js/auto';
+import React from "react";
+import { Bar } from "react-chartjs-2";
+import {
+  ChartData,
+  Chart as ChartJS,
+  ChartOptions,
+  Legend,
+  Title,
+  Tooltip,
+} from "chart.js/auto";
+import { DateRange, useChartData } from "./hooks/useChartData";
 
+ChartJS.register(Title, Tooltip, Legend);
 
 export interface solar {
   id: number;
@@ -12,44 +22,39 @@ export interface solar {
 }
 
 interface SolarPlotProps {
-  solarJson: solar[];
+  solarDateRange: DateRange;
 }
 
-ChartJS.register(
-  Title,
-  Tooltip,
-  Legend
-);
-
-function SolarPlot({ solarJson }: SolarPlotProps) {
+const SolarPlot: React.FC<SolarPlotProps> = ({ solarDateRange }) => {
+  const solarJson = useChartData<solar>("/solar", solarDateRange);
   if (!solarJson || solarJson.length === 0) {
     return <h1>There is no data for the Solar chart</h1>;
   }
 
-  const solarData: ChartData<'bar', number[], string> = {
+  const solarData: ChartData<"bar", number[], string> = {
     labels: solarJson.map((x) => x.date_time),
     datasets: [
       {
-        label: 'Power Generated',
+        label: "Power Generated",
         data: solarJson.map((y) => y.power_generated),
-        backgroundColor: 'green',
-        borderColor: 'green',
+        backgroundColor: "green",
+        borderColor: "green",
         borderWidth: 1,
       },
     ],
   };
 
-  const solarOptions: ChartOptions<'bar'> = {
+  const solarOptions: ChartOptions<"bar"> = {
     responsive: true,
     maintainAspectRatio: true,
     plugins: {
       title: {
         display: true,
-        text: 'Solar Plot',
+        text: "Solar Plot",
       },
       legend: {
-        position: 'right',
-        align: 'center',
+        position: "right",
+        align: "center",
         display: true,
         labels: {
           usePointStyle: true,
@@ -63,14 +68,14 @@ function SolarPlot({ solarJson }: SolarPlotProps) {
         ticks: {
           display: true,
           autoSkip: true,
-          maxTicksLimit: 10, 
-          maxRotation: 0, 
-          minRotation: 0, 
-        }
+          maxTicksLimit: 10,
+          maxRotation: 0,
+          minRotation: 0,
+        },
       },
       y: {
-        type: 'linear',
-        position: 'left',
+        type: "linear",
+        position: "left",
         grid: {
           display: true,
         },
@@ -90,6 +95,6 @@ function SolarPlot({ solarJson }: SolarPlotProps) {
   };
 
   return <Bar data={solarData} options={solarOptions} />;
-}
+};
 
 export default SolarPlot;

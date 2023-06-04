@@ -1,6 +1,5 @@
 name: Build webserver
 
-# Controls when the workflow will run
 on:
   push:
     branches: ["master"]
@@ -8,23 +7,61 @@ on:
     branches: ["master"]
     types: [closed]
 
-# permissions are needed if pushing to ghcr.io
+env:
+  NODE_VERSION: 18.x
+
 jobs:
-  publish-docker-image:
-    name: Publish Docker image
+  Build-Frontend:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      # Get the repository's code
+      - name: Install Node.js and yarn
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache-dependency-path: ./src/frontend/package.json
+      
+      - name: Install Yarn
+        run: | 
+          cd ./src/frontend/
+          npm install -g yarn
+
+      - name: Yarn version Berry
+        working-directory: ./src/frontend/
+        run: yarn set version berry
+
+      - name: Change directory and install dependencies
+        working-directory: ./src/frontend/
+        run: yarn install
+
+      - name: Linting 
+        working-directory: ./src/frontend/
+        run: yarn lint
+
+      - name: Build
+        working-directory: ./src/frontend/
+        run: yarn build
+
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-build
+          path: ./src/frontend/build
+
+  publish-docker-image:
+    name: Publish Docker image
+    needs: Build-Frontend
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      # https://github.com/docker/setup-qemu-action
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2.1.0
-      # https://github.com/docker/setup-buildx-action
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2.3.0
+        uses: actions/checkout@v3
+
+      - name: Set Docker build arguments
+        run: |
+          echo "ENABLE_FRONTEND=false" >> $GITHUB_ENV
+
       - name: Login to GHCR
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v1
@@ -32,29 +69,11 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Docker meta
-        id: meta # you'll use this in the next step
-        uses: docker/metadata-action@v3
-        with:
-               # list of Docker images to use as base name for tags
-          images: |
-                 ghcr.io/ktomi96/power_manager/webserver
-               # Docker tags based on the following events/attributes
-          tags: |
-           type=schedule
-           type=ref,event=branch
-           type=ref,event=pr
-           type=semver,pattern={{version}}
-           type=semver,pattern={{major}}.{{minor}}
-           type=semver,pattern={{major}}
-           type=sha
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4.0.0
         with:
+          context: .
           file: ./Dockerfile.webserver
-          platforms: linux/amd64, linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ghcr.io/ktomi96/power_manager/webserver:latest
