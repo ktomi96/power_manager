@@ -104,6 +104,7 @@ def get_solar_agr():
     return jsonify(solar_data) if solar_data is not None else jsonify(None)
 
 
+
 @app.route("/ac_status", methods=["GET"])
 def ac_status():
     try:
