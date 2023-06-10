@@ -11,9 +11,6 @@ from flask import (
     request,
     url_for,
     render_template,
-    escape,
-    flash,
-    session,
     jsonify,
 )
 import dotenv
@@ -102,7 +99,8 @@ def get_solar_agr():
     if ((start_date or end_date)) is None:
         return {"error": 404}
 
-    solar_data = solar_produce_agr([start_date, end_date])
+    solar_data = int(solar_produce_agr([start_date, end_date]))
+    print(f"solar_sum: {solar_data}")
     return jsonify(solar_data) if solar_data is not None else jsonify(None)
 
 
@@ -110,7 +108,11 @@ def get_solar_agr():
 def ac_status():
     try:
         ac_status = ac_status_getter()
-        return ac_status or {"error": "ac_status"}, 404
+        return (
+            jsonify(ac_status)
+            if ac_status is not None
+            else ({"error": "ac_status"}, 404)
+        )
     except Exception as esc:
         print(esc, file=sys.stderr)
 
@@ -154,4 +156,3 @@ def is_webserver_running():
 init_dotenv()
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-
