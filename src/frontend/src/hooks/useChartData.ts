@@ -7,8 +7,9 @@ export type DateRange = {
   endDate: Date | null;
 };
 
-export function useChartData<T>(fetchUrl: string, dateRange: DateRange): T[] {
+export function useChartData<T>(fetchUrl: string, dateRange: DateRange): T[] | null {
   const [chartData, setChartData] = useState<T[]>([]);
+  const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
     const { startDate, endDate } = dateRange;
@@ -20,12 +21,22 @@ export function useChartData<T>(fetchUrl: string, dateRange: DateRange): T[] {
         .get(
           `${fetchUrl}?start_date=${formattedStartDate}&end_date=${formattedEndDate}`
         )
-        .then((res) => res.data)
-        .then(setChartData);
+        .then((res) => {
+          setChartData(res.data);
+          setError(false);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     } else {
       setChartData([]);
+      setError(false);
     }
   }, [fetchUrl, dateRange]);
+
+  if (error) {
+    return null;
+  }
 
   return chartData;
 }

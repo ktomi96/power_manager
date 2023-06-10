@@ -84,7 +84,10 @@ const App: React.FC = () => {
               size="small"
               endIcon={<SendIcon />}
               onClick={() => {
-                setSolarDateRange; // Reset start date as the first day of the month and end date as yesterday for solar data
+                setSolarDateRange({
+                  startDate: lastMonth,
+                  endDate: yesterdayDate,
+                }); // Reset start date as the first day of the month and end date as yesterday for solar data
               }}
             >
               Reset

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Bar } from "react-chartjs-2";
 import {
   ChartData,
@@ -9,6 +9,7 @@ import {
   Tooltip,
 } from "chart.js/auto";
 import { DateRange, useChartData } from "./hooks/useChartData";
+import { usePreviousEffect } from "./hooks/usePreviusEffect";
 
 ChartJS.register(Title, Tooltip, Legend);
 
@@ -24,19 +25,34 @@ export interface solar {
 interface SolarPlotProps {
   solarDateRange: DateRange;
 }
-
 const SolarPlot: React.FC<SolarPlotProps> = ({ solarDateRange }) => {
   const solarJson = useChartData<solar>("/solar", solarDateRange);
-  if (!solarJson || solarJson.length === 0) {
+  const [currSolarJson, setCurrSolarJson] = useState<solar[] | null>(solarJson);
+
+  usePreviousEffect(
+    solarJson,
+    (prev, curr) => {
+      if (curr && curr.length > 0) {
+        setCurrSolarJson(curr);
+      } else if (curr === null || (prev && prev.length === 0 && curr.length > prev.length)) {
+        setCurrSolarJson(curr);
+      } else if (prev && curr && curr.length < prev.length) {
+        setCurrSolarJson(prev);
+      }
+    },
+    [solarJson, solarDateRange]
+  );
+  if (!currSolarJson || currSolarJson.length === 0) {
     return <h1>There is no data for the Solar chart</h1>;
   }
+  
 
   const solarData: ChartData<"bar", number[], string> = {
-    labels: solarJson.map((x) => x.date_time),
+    labels: currSolarJson.map((x) => x.date_time),
     datasets: [
       {
         label: "Power Generated",
-        data: solarJson.map((y) => y.power_generated),
+        data: currSolarJson.map((y) => y.power_generated),
         backgroundColor: "green",
         borderColor: "green",
         borderWidth: 1,

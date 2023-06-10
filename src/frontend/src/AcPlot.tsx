@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   ChartData,
@@ -9,6 +9,7 @@ import {
   Tooltip,
 } from "chart.js/auto";
 import { DateRange, useChartData } from "./hooks/useChartData";
+import { usePreviousEffect } from "./hooks/usePreviusEffect";
 
 ChartJS.register(Title, Tooltip, Legend);
 
@@ -25,11 +26,26 @@ interface AcPlotProps {
 
 const ACPlot: React.FC<AcPlotProps> = ({ acDateRange }) => {
   const acJson = useChartData<ac>("/ac", acDateRange);
-  if (!acJson || acJson.length === 0) {
+  const [currAcJson, setCurrAcJson] = useState<ac[] | null>(acJson);
+
+  usePreviousEffect(
+    acJson,
+    (prev, curr) => {
+      if (curr && curr.length > 0) {
+        setCurrAcJson(curr);
+      } else if (curr === null || (prev && prev.length === 0 && curr.length > prev.length)) {
+        setCurrAcJson(curr);
+      } else if (prev && curr && curr.length < prev.length) {
+        setCurrAcJson(prev);
+      }
+    },
+    [acJson, acDateRange]
+  );
+  if (!currAcJson || currAcJson.length === 0) {
     return <h1>There is no data for the AC chart</h1>;
   }
 
-  const filteredAcJson = acJson.reduce((acc: ac[], curr: ac, i): ac[] => {
+  const filteredAcJson = currAcJson.reduce((acc: ac[], curr: ac, i): ac[] => {
     const prev = acc[i - 1];
     const currIndoorTemp = curr.indoor_temperature;
     const currOutdoorTemp = curr.out_door_temperature;
