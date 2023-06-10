@@ -11,9 +11,6 @@ from flask import (
     request,
     url_for,
     render_template,
-    escape,
-    flash,
-    session,
     jsonify,
 )
 import dotenv
@@ -154,4 +151,3 @@ def is_webserver_running():
 init_dotenv()
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-

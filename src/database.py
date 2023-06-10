@@ -104,18 +104,19 @@ def df_to_db(df: pandas.DataFrame, db_url: str, tablename: str):
 
 
 def query(db_url, obj):
-    engine = create_engine(db_url, echo=False, future=False)
+    engine = create_engine(db_url, echo=False, future=True)
 
     with Session(engine) as session:
         """
         sqlalchemy 2.0 brakes pandas, cant use execute
         return session.execute(select(obj)).all()
         """
+        print(session.query(obj))
         return session.query(obj)
 
 
 def query_last_row(db_url, obj):
-    engine = create_engine(db_url, echo=False, future=False)
+    engine = create_engine(db_url, echo=False, future=True)
 
     with Session(engine) as session:
         """
@@ -124,29 +125,41 @@ def query_last_row(db_url, obj):
         """
         return session.query(obj).order_by(obj.id.desc()).first()
 
+
 def calculate_date_time_scale(date_from: str, date_to: str):
     d0 = pandas.to_datetime(date_from)
     d1 = pandas.to_datetime(date_to)
     delta = d1 - d0
     if delta.days == 1:
-       return '1T'
+        return "1T"
     elif delta.days > 15:
-       return '1D'
-    return '1H'
+        return "1D"
+    return "1H"
+
 
 def ac_query_to_df(db_url, obj, date_from: str, date_to: str):
     df = query_to_df(db_url, obj, date_from, date_to)
-    agg_indoor = pandas.NamedAgg(column="indoor_temperature", aggfunc='max')
-    agg_outdoor = pandas.NamedAgg(column="out_door_temperature", aggfunc='mean')
-    agg_running = pandas.NamedAgg(column="running", aggfunc='mean')
-    agg_date_time = pandas.NamedAgg(column="date_time", aggfunc='max')
-    df = df.groupby(pandas.Grouper(key='date_time', freq=calculate_date_time_scale(date_from, date_to))).agg(indoor_temperature=agg_indoor, out_door_temperature=agg_outdoor, running=agg_running, date_time=agg_date_time)
+    agg_indoor = pandas.NamedAgg(column="indoor_temperature", aggfunc="max")
+    agg_outdoor = pandas.NamedAgg(column="out_door_temperature", aggfunc="mean")
+    agg_running = pandas.NamedAgg(column="running", aggfunc="mean")
+    agg_date_time = pandas.NamedAgg(column="date_time", aggfunc="max")
+    df = df.groupby(
+        pandas.Grouper(
+            key="date_time", freq=calculate_date_time_scale(date_from, date_to)
+        )
+    ).agg(
+        indoor_temperature=agg_indoor,
+        out_door_temperature=agg_outdoor,
+        running=agg_running,
+        date_time=agg_date_time,
+    )
 
     return df
 
+
 def query_to_df(db_url, obj, date_from: str, date_to: str):
     try:
-        engine = create_engine(db_url, echo=False, future=False)
+        engine = create_engine(db_url, echo=False, future=True)
         with Session(engine) as session:
             query_data = (
                 session.query(obj)
@@ -172,7 +185,7 @@ def query_to_df_agr(db_url, obj, to_agr, date_from: str, date_to: str):
 
 
 def is_table_exists(db_url: str, table_name: str):
-    engine = create_engine(db_url, echo=False, future=False)
+    engine = create_engine(db_url, echo=False, future=True)
     inspector = inspect(engine)
 
     return table_name in inspector.get_table_names()
@@ -195,10 +208,9 @@ if __name__ == "__main__":
 
     today = date.today().strftime("%Y-%m-%d")
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(today)
-    print(now)
+    #
+    df = query_last_row(db_url, SOLAR_LOG)
+    print(df)
     df = query_to_df(db_url, SOLAR_LOG, today, now)
 
-    print(df.tail())
-
-    print(is_table_exists(db_url, "power_meter_aggregate"))
+#
