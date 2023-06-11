@@ -61,7 +61,7 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
-          name: build-artifacts
+          name: frontend-build
           path: ./src/frontend/build
 
       - name: Set Docker build arguments
