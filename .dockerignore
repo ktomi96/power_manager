@@ -1,7 +1,6 @@
 *.env
 
 
-/src/frontend/build/
 
 /src/frontend/node_modules/
 *.yml
