@@ -179,3 +179,5 @@ yarn-error.log*
 #Initial Yaml file uploaded, we dont want to update it with local file because it will conflict with ci.
 **/.yarnrc.yml
 
+#VS Code
+.vscode

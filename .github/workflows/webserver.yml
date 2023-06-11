@@ -22,9 +22,9 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache-dependency-path: ./src/frontend/package.json
-      
+
       - name: Install Yarn
-        run: | 
+        run: |
           cd ./src/frontend/
           npm install -g yarn
 
@@ -36,7 +36,7 @@ jobs:
         working-directory: ./src/frontend/
         run: yarn install
 
-      - name: Linting 
+      - name: Linting
         working-directory: ./src/frontend/
         run: yarn lint
 
@@ -57,6 +57,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+          path: ./src/frontend/build
 
       - name: Set Docker build arguments
         run: |
