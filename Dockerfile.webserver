@@ -12,10 +12,13 @@ COPY pyproject.toml poetry.lock ./
 RUN POETRY_VIRTUALENVS_CREATE=false poetry install
 COPY ./src/ /app/src/
 
+RUN   apt update && \
+      apt install --no-install-recommends -y curl && \
+      apt clean && rm -rf /var/lib/apt/lists/*
+
 ARG ENABLE_FRONTEND=false
 RUN if [ "$ENABLE_FRONTEND" = "true" ]; then \
       apt update && \
-      apt install --no-install-recommends -y curl && \
       curl -fsSL https://deb.nodesource.com/setup_20.x | bash - &&\
       apt-get install -y nodejs && \
       corepack enable && \
