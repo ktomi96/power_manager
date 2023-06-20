@@ -190,6 +190,9 @@ def is_table_exists(db_url: str, table_name: str):
 
     return table_name in inspector.get_table_names()
 
+def power_meter_last_entry():
+    df = query_last_row(db_url, POWER_METER)
+    return df.date_time.strftime("%Y-%m-%d")
 
 if __name__ == "__main__":
     ac_log = AC_LOG()
@@ -209,8 +212,8 @@ if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     #
-    df = query_last_row(db_url, SOLAR_LOG)
-    print(df)
+    df = query_last_row(db_url, POWER_METER)
+    print(df.date_time.strftime("%Y-%m-%d"))
     df = query_to_df(db_url, SOLAR_LOG, today, now)
 
 #

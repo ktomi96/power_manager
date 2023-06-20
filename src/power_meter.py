@@ -13,6 +13,7 @@ from database import (
     query_last_row,
     df_to_db,
     is_table_exists,
+    power_meter_last_entry,
 )
 
 env_path = "./env/"
@@ -39,7 +40,7 @@ def power_meter_logger(username: str, password: str, install_date: str):
         print(f"Imported and appended all power meter data: {datetime.now()}")
         return dotenv.set_key(env_file, "START_MVM_METERING_PARSE_ALL", "False")
 
-    log_power_data(username, password, date_from, date_to)
+    log_power_data(username, password, power_meter_last_entry(), date_to)
     return print(f"Logged power meter data: {datetime.now()}")
 
 
@@ -73,7 +74,6 @@ def aggregate_power_meter_response(df: pandas.DataFrame) -> pandas.DataFrame:
     dfs = []
 
     for name, group in df:
-
         group = group.drop("date_time", axis=1)
         group = group.agg(func=[sum])
         group = group.reset_index(drop=True)

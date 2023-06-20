@@ -141,15 +141,14 @@ def logger_schulder(*args, ac, solar, trigger_values_dict):
         hour=trigger_values_dict["solar_logger_trigger_hour"],
         minute=trigger_values_dict["solar_logger_trigger_minute"],
     )
-    # TODO: Fix power_meter_logging
-    # create_job(
-    #     scheduler=scheduler,
-    #     func=power_meter_logging,
-    #     args=[username, password, install_date],
-    #     trigger="cron",
-    #     hour=trigger_values_dict["power_logger_trigger_hour"],
-    #     minute=trigger_values_dict["power_logger_trigger_minute"],
-    # )
+    create_job(
+        scheduler=scheduler,
+        func=power_meter_logging,
+        args=[username, password, install_date],
+        trigger="cron",
+        hour=trigger_values_dict["power_logger_trigger_hour"],
+        minute=trigger_values_dict["power_logger_trigger_minute"],
+    )
 
     scheduler.add_listener(job_handler, EVENT_JOB_ERROR | EVENT_JOB_EXECUTED)
     print("Press Ctrl+C to exit")
