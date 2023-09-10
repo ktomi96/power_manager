@@ -13,7 +13,10 @@ import {
   FormControlLabel,
   FormControl,
   FormLabel,
+  useTheme,
 } from "@mui/material";
+import ContentLoader, { IContentLoaderProps } from "react-content-loader";
+import { JSX } from "react/jsx-runtime";
 
 const AcSetter: React.FC = () => {
   const acSetterDisplay = useRef(true);
@@ -48,6 +51,47 @@ const AcSetter: React.FC = () => {
       label: "30°C",
     },
   ];
+
+  const MyLoader = (props: JSX.IntrinsicAttributes & IContentLoaderProps) => {
+    const theme = useTheme();
+    const classes = {
+      root: {
+        width: "100%",
+        height: "100%",
+      },
+      loader: {
+        [theme.breakpoints.down("sm")]: {
+          width: "80%", // Adjust this value for smaller devices
+        },
+        [theme.breakpoints.up("md")]: {
+          width: "100%",
+        },
+        [theme.breakpoints.up("lg")]: {
+          width: "60%", // Adjust this value for larger devices
+        },
+      },
+    };
+
+    return (
+      <ContentLoader
+        speed={1}
+        width={1180}
+        height={115}
+        viewBox="0 0 1180 115"
+        className={`${classes.root} ${classes.loader}`}
+        backgroundColor="#deddda"
+        foregroundColor="#ecebeb"
+        {...props}
+      >
+        <rect x="0" y="11" rx="0" ry="0" width="227" height="42" />
+        <rect x="141" y="103" rx="0" ry="0" width="1" height="0" />
+        <rect x="1" y="78" rx="0" ry="0" width="222" height="40" />
+        <rect x="255" y="33" rx="0" ry="0" width="218" height="5" />
+        <rect x="369" y="87" rx="0" ry="0" width="84" height="30" />
+        <circle cx="364" cy="37" r="9" />
+      </ContentLoader>
+    );
+  };
 
   function valuetext(value: number) {
     return `${value}°C`;
@@ -105,8 +149,8 @@ const AcSetter: React.FC = () => {
       spacing={2}
     >
       {isLoading ? (
-        <Grid item xs={12}>
-          <CircularProgress />
+        <Grid item xs={12} sm={6}>
+          <MyLoader />
         </Grid>
       ) : acSetterDisplay ? (
         <>

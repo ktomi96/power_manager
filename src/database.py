@@ -190,9 +190,11 @@ def is_table_exists(db_url: str, table_name: str):
 
     return table_name in inspector.get_table_names()
 
+
 def power_meter_last_entry():
     df = query_last_row(db_url, POWER_METER)
     return df.date_time.strftime("%Y-%m-%d")
+
 
 if __name__ == "__main__":
     ac_log = AC_LOG()
