@@ -7,23 +7,21 @@ import {
   Switch,
   Typography,
   Stack,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
-  FormLabel,
   useTheme,
 } from "@mui/material";
 import ContentLoader, { IContentLoaderProps } from "react-content-loader";
 import { JSX } from "react/jsx-runtime";
+import AcModeSelector, { AcModes } from "./components/AcModeSelector";
+
+interface ACApiResponse {
+  mode: AcModes;
+  running: boolean;
+  target_temperature: string;
+}
 
 const AcSetter: React.FC = () => {
   const acSetterDisplay = useRef(true);
-  const [AcModeValue, setAcModeValue] = useState<string>("auto_mode");
-
-  const handleAcModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAcModeValue(event.target.value);
-  };
+  const [AcModeValue, setAcModeValue] = useState<AcModes>(AcModes.auto);
 
   const [AcStateValue, setAcStateValue] = useState<boolean>(false);
   const handleAcStateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,8 +98,9 @@ const AcSetter: React.FC = () => {
     axios
       .get("/ac_status")
       .then((response) => {
-        const { mode, running, target_temperature } = response.data;
-        setAcModeValue(mode);
+        const { mode, running, target_temperature } =
+          response.data as ACApiResponse;
+        setAcModeValue(mode ?? AcModes.auto);
         setAcStateValue(running);
         setAcTemperature(parseInt(target_temperature));
         setIsLoading(false);
@@ -151,36 +150,12 @@ const AcSetter: React.FC = () => {
       ) : acSetterDisplay ? (
         <div className="flex flex-row flex-wrap">
           <div className="w-full sm:w-1/3">
-            <FormControl>
-              <div className="flex flex-col">
-                <FormLabel id="row-radio-buttons-group-label">
-                  AC mode
-                </FormLabel>
-                <RadioGroup
-                  row
-                  aria-labelledby="row-radio-buttons-group-label"
-                  name="row-radio-buttons-group"
-                  value={AcModeValue}
-                  onChange={handleAcModeChange}
-                >
-                  <FormControlLabel
-                    value="heating_mode"
-                    control={<Radio />}
-                    label="Heating"
-                  />
-                  <FormControlLabel
-                    value="auto_mode"
-                    control={<Radio />}
-                    label="Auto"
-                  />
-                  <FormControlLabel
-                    value="cooling_mode"
-                    control={<Radio />}
-                    label="Cooling"
-                  />
-                </RadioGroup>
-              </div>
-            </FormControl>
+            <div>
+              <AcModeSelector
+                defaultMode={AcModeValue}
+                onModeChange={setAcModeValue}
+              />
+            </div>
           </div>
           <div className="w-full sm:w-2/3">
             <Slider
