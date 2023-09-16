@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import {
   CircularProgress,
-  Grid,
   Button,
   Slider,
   Switch,
@@ -141,48 +140,49 @@ const AcSetter: React.FC = () => {
   };
 
   return (
-    <Grid
-      container
-      direction="row"
-      justifyContent="flex-start"
-      alignItems="flex-start"
-      spacing={2}
+    <div
+      className="grow
+    "
     >
       {isLoading ? (
-        <Grid item xs={12} sm={6}>
+        <div className="w-full grow">
           <MyLoader />
-        </Grid>
+        </div>
       ) : acSetterDisplay ? (
-        <>
-          <Grid item xs={12} sm={6}>
+        <div className="flex flex-row flex-wrap">
+          <div className="w-full sm:w-1/3">
             <FormControl>
-              <FormLabel id="row-radio-buttons-group-label">AC mode</FormLabel>
-              <RadioGroup
-                row
-                aria-labelledby="row-radio-buttons-group-label"
-                name="row-radio-buttons-group"
-                value={AcModeValue}
-                onChange={handleAcModeChange}
-              >
-                <FormControlLabel
-                  value="heating_mode"
-                  control={<Radio />}
-                  label="Heating"
-                />
-                <FormControlLabel
-                  value="auto_mode"
-                  control={<Radio />}
-                  label="Auto"
-                />
-                <FormControlLabel
-                  value="cooling_mode"
-                  control={<Radio />}
-                  label="Cooling"
-                />
-              </RadioGroup>
+              <div className="flex flex-col">
+                <FormLabel id="row-radio-buttons-group-label">
+                  AC mode
+                </FormLabel>
+                <RadioGroup
+                  row
+                  aria-labelledby="row-radio-buttons-group-label"
+                  name="row-radio-buttons-group"
+                  value={AcModeValue}
+                  onChange={handleAcModeChange}
+                >
+                  <FormControlLabel
+                    value="heating_mode"
+                    control={<Radio />}
+                    label="Heating"
+                  />
+                  <FormControlLabel
+                    value="auto_mode"
+                    control={<Radio />}
+                    label="Auto"
+                  />
+                  <FormControlLabel
+                    value="cooling_mode"
+                    control={<Radio />}
+                    label="Cooling"
+                  />
+                </RadioGroup>
+              </div>
             </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6}>
+          </div>
+          <div className="w-full sm:w-2/3">
             <Slider
               aria-label="Custom marks"
               defaultValue={20}
@@ -195,8 +195,8 @@ const AcSetter: React.FC = () => {
               value={AcTemperature}
               onChangeCommitted={handleAcTemperatureChange}
             />
-          </Grid>
-          <Grid item xs={6}>
+          </div>
+          <div className="w-1/2">
             <Stack direction="row" spacing={1} alignItems="center">
               <Typography>Off</Typography>
               <Switch
@@ -207,8 +207,8 @@ const AcSetter: React.FC = () => {
               />
               <Typography>On</Typography>
             </Stack>
-          </Grid>
-          <Grid item xs={6}>
+          </div>
+          <div className="w-1/2 text-end sm:text-left">
             <Button
               variant="contained"
               size="small"
@@ -231,14 +231,14 @@ const AcSetter: React.FC = () => {
               )}
               {!isPosting ? "Set State" : "Posting"}
             </Button>
-          </Grid>
-        </>
+          </div>
+        </div>
       ) : (
-        <Grid item xs={12}>
+        <div className="flex grow">
           <Typography>Error loading AC data</Typography>
-        </Grid>
+        </div>
       )}
-    </Grid>
+    </div>
   );
 };
 

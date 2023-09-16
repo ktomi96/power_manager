@@ -2,7 +2,7 @@ import React from "react";
 import DatePicker from "react-datepicker";
 import moment from "moment";
 import { useState } from "react";
-import { Grid, Button } from "@mui/material";
+import { Button } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import ACPlot from "./AcPlot";
 import SolarPlot from "./SolarPlot";
@@ -45,30 +45,21 @@ const App: React.FC = () => {
   };
 
   return (
-    <Grid
-      container
-      direction="row"
-      justifyContent="flex-start"
-      alignItems="flex-start"
-      spacing={2}
-    >
-      <Grid item xs={12}>
+    <div className="flex flex-row flex-wrap gap-2 flex-auto">
+      <div className="w-full">
         <h1>Solar and AC data</h1>
-      </Grid>
-      <Grid item xs={12} sm={4}>
-        <SolarSum solarDateRange={solarDateRange} />
-      </Grid>
-      <Grid item xs={12} sm={8}>
-        <AcSetter />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <Grid
-          container
-          direction="row"
-          justifyContent="flex-start"
-          alignItems="flex-start"
-        >
-          <Grid item xs={8}>
+      </div>
+      <div className="flex w-full gap-4 flex-auto flex-wrap">
+        <div className="sm:w-full sm:grow">
+          <SolarSum solarDateRange={solarDateRange} />
+        </div>
+        <div className="grow">
+          <AcSetter />
+        </div>
+      </div>
+      <div className="flex grow w-full sm:w-1/2">
+        <div className="grid grid-cols-2 gap-4 grow">
+          <div>
             <DatePicker
               selectsRange={true}
               dateFormat="yyyy/MM/dd"
@@ -76,8 +67,8 @@ const App: React.FC = () => {
               endDate={solarDateRange.endDate}
               onChange={onSolDateChange}
             />
-          </Grid>
-          <Grid item xs={4}>
+          </div>
+          <div>
             <Button
               variant="contained"
               color="primary"
@@ -92,20 +83,16 @@ const App: React.FC = () => {
             >
               Reset
             </Button>
-          </Grid>
-          <Grid item xs={12}>
+          </div>
+
+          <div className="col-span-2">
             <SolarPlot solarDateRange={solarDateRange} />
-          </Grid>
-        </Grid>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <Grid
-          container
-          direction="row"
-          justifyContent="flex-start"
-          alignItems="flex-start"
-        >
-          <Grid item xs={8}>
+          </div>
+        </div>
+      </div>
+      <div className="flex grow">
+        <div className="grid grid-cols-2 gap-4 grow">
+          <div>
             <DatePicker
               selectsRange={true}
               dateFormat="yyyy/MM/dd"
@@ -113,8 +100,8 @@ const App: React.FC = () => {
               endDate={acDateRange.endDate}
               onChange={onACDateChange}
             />
-          </Grid>
-          <Grid item xs={4}>
+          </div>
+          <div>
             <Button
               variant="contained"
               color="primary"
@@ -129,13 +116,13 @@ const App: React.FC = () => {
             >
               Reset
             </Button>
-          </Grid>
-          <Grid item xs={12}>
+          </div>
+          <div className="col-span-2">
             <ACPlot acDateRange={acDateRange} />
-          </Grid>
-        </Grid>
-      </Grid>
-    </Grid>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
