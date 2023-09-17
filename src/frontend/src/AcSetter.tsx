@@ -3,7 +3,6 @@ import axios from "axios";
 import {
   CircularProgress,
   Button,
-  Slider,
   Switch,
   Typography,
   Stack,
@@ -12,6 +11,7 @@ import {
 import ContentLoader, { IContentLoaderProps } from "react-content-loader";
 import { JSX } from "react/jsx-runtime";
 import AcModeSelector, { AcModes } from "./components/AcModeSelector";
+import Slider from "./components/Slider";
 
 interface ACApiResponse {
   mode: AcModes;
@@ -29,25 +29,8 @@ const AcSetter: React.FC = () => {
   };
 
   const [AcTemperature, setAcTemperature] = useState<number>(20);
-  const handleAcTemperatureChange = (
-    event: React.SyntheticEvent | Event,
-    value: number | Array<number>
-  ) => {
-    setAcTemperature(value as number);
-  };
   const [isLoading, setIsLoading] = useState(true);
   const [isPosting, setIsPosting] = useState(false);
-
-  const marks = [
-    {
-      value: 20,
-      label: "20°C",
-    },
-    {
-      value: 30,
-      label: "30°C",
-    },
-  ];
 
   const MyLoader = (props: JSX.IntrinsicAttributes & IContentLoaderProps) => {
     const theme = useTheme();
@@ -89,10 +72,6 @@ const AcSetter: React.FC = () => {
       </ContentLoader>
     );
   };
-
-  function valuetext(value: number) {
-    return `${value}°C`;
-  }
 
   useEffect(() => {
     axios
@@ -137,7 +116,20 @@ const AcSetter: React.FC = () => {
         console.log(error);
       });
   };
-
+  const marks = [
+    {
+      value: 20,
+      label: "20°C",
+    },
+    {
+      value: 25,
+      label: "25°C",
+    },
+    {
+      value: 30,
+      label: "30°C",
+    },
+  ];
   return (
     <div
       className="grow
@@ -159,16 +151,11 @@ const AcSetter: React.FC = () => {
           </div>
           <div className="w-full sm:w-2/3">
             <Slider
-              aria-label="Custom marks"
-              defaultValue={20}
-              getAriaValueText={valuetext}
-              step={1}
-              valueLabelDisplay="auto"
-              marks={marks}
               min={20}
               max={30}
-              value={AcTemperature}
-              onChangeCommitted={handleAcTemperatureChange}
+              step={1}
+              marks={marks}
+              onValueChange={setAcTemperature}
             />
           </div>
           <div className="w-1/2">

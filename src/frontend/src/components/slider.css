@@ -1,0 +1,15 @@
+.thumb-variant::-webkit-slider-thumb {
+  background-color: #2563eb;
+  border-radius: 50%;
+}
+
+.thumb-variant::-moz-range-thumb {
+  background-color: #2563eb;
+  border-radius: 50%;
+}
+
+.thumb-variant::-ms-thumb {
+  background-color: #2563eb;
+  border-radius: 50%;
+}
+
