@@ -1,17 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import {
-  CircularProgress,
-  Button,
-  Switch,
-  Typography,
-  Stack,
-  useTheme,
-} from "@mui/material";
+import { CircularProgress, Button, Typography, useTheme } from "@mui/material";
 import ContentLoader, { IContentLoaderProps } from "react-content-loader";
 import { JSX } from "react/jsx-runtime";
 import AcModeSelector, { AcModes } from "./components/AcModeSelector";
 import Slider from "./components/Slider";
+import ToggleSwitch from "./components/ToggleSwitch";
 
 interface ACApiResponse {
   mode: AcModes;
@@ -24,9 +18,6 @@ const AcSetter: React.FC = () => {
   const [AcModeValue, setAcModeValue] = useState<AcModes>(AcModes.auto);
 
   const [AcStateValue, setAcStateValue] = useState<boolean>(false);
-  const handleAcStateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAcStateValue(event.target.checked);
-  };
 
   const [AcTemperature, setAcTemperature] = useState<number>(20);
   const [isLoading, setIsLoading] = useState(true);
@@ -159,16 +150,14 @@ const AcSetter: React.FC = () => {
             />
           </div>
           <div className="w-1/2">
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Typography>Off</Typography>
-              <Switch
-                checked={AcStateValue}
-                onChange={handleAcStateChange}
-                color="success"
-                inputProps={{ "aria-label": "ant design" }}
+            <div className="flex gap-2">
+              <div>Off</div>
+              <ToggleSwitch
+                defaultValue={AcStateValue}
+                onValueChange={setAcStateValue}
               />
-              <Typography>On</Typography>
-            </Stack>
+              <div>On</div>
+            </div>
           </div>
           <div className="w-1/2 text-end sm:text-left">
             <Button
