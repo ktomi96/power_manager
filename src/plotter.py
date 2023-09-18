@@ -147,4 +147,5 @@ if __name__ == "__main__":
     # df = pd.concat(df_list, ignore_index=True)
     # ac_plot(df)
     # path = "./logs/solar"
-    solar_produce(["2023-01-30", "2023-01-30"])
+    plot = ac_plotter(["2023-09-18", "2023-09-18"])
+    print(plot)

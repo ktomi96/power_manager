@@ -20,6 +20,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import sessionmaker, declarative_base, Session
 import pandas
 import dotenv
+import numpy
 
 env_path = "./env/"
 env_file = f"{env_path}.env"
@@ -137,13 +138,30 @@ def calculate_date_time_scale(date_from: str, date_to: str):
     return "1H"
 
 
-def ac_query_to_df(db_url, obj, date_from: str, date_to: str):
+def ac_query_to_df(db_url, obj, date_from: str, date_to: str, z_score_threshold=2.0):
     df = query_to_df(db_url, obj, date_from, date_to)
+
+    # Calculate Z-scores for indoor_temperature and outdoor_temperature columns
+    z_scores_indoor = numpy.abs(
+        (df["indoor_temperature"] - df["indoor_temperature"].mean())
+        / df["indoor_temperature"].std()
+    )
+    z_scores_outdoor = numpy.abs(
+        (df["out_door_temperature"] - df["out_door_temperature"].mean())
+        / df["out_door_temperature"].std()
+    )
+
+    # Filter rows where Z-scores are less than the threshold
+    df_filtered = df[
+        (z_scores_indoor <= z_score_threshold) & (z_scores_outdoor <= z_score_threshold)
+    ]
+
     agg_indoor = pandas.NamedAgg(column="indoor_temperature", aggfunc="max")
     agg_outdoor = pandas.NamedAgg(column="out_door_temperature", aggfunc="mean")
     agg_running = pandas.NamedAgg(column="running", aggfunc="mean")
     agg_date_time = pandas.NamedAgg(column="date_time", aggfunc="max")
-    df = df.groupby(
+
+    return df_filtered.groupby(
         pandas.Grouper(
             key="date_time", freq=calculate_date_time_scale(date_from, date_to)
         )
@@ -153,8 +171,6 @@ def ac_query_to_df(db_url, obj, date_from: str, date_to: str):
         running=agg_running,
         date_time=agg_date_time,
     )
-
-    return df
 
 
 def query_to_df(db_url, obj, date_from: str, date_to: str):
