@@ -2,14 +2,14 @@ import React from "react";
 import DatePicker from "react-datepicker";
 import moment from "moment";
 import { useState } from "react";
-import { Button } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
 import ACPlot from "./AcPlot";
 import SolarPlot from "./SolarPlot";
 import AcSetter from "./AcSetter";
 import "react-datepicker/dist/react-datepicker.css";
 import { DateRange } from "./hooks/useChartData";
 import SolarSum from "./SolarSum";
+import Button from "./components/Button";
+import { PencilSquareIcon } from "@heroicons/react/24/solid";
 
 const App: React.FC = () => {
   const today = moment();
@@ -70,19 +70,15 @@ const App: React.FC = () => {
           </div>
           <div>
             <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              endIcon={<SendIcon />}
+              text="Reset"
+              icon={<PencilSquareIcon />}
               onClick={() => {
                 setSolarDateRange({
                   startDate: lastMonth,
                   endDate: yesterdayDate,
                 }); // Reset start date as the first day of the month and end date as yesterday for solar data
               }}
-            >
-              Reset
-            </Button>
+            />
           </div>
 
           <div className="col-span-2">
@@ -103,19 +99,15 @@ const App: React.FC = () => {
           </div>
           <div>
             <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              endIcon={<SendIcon />}
+              text="Reset"
+              icon={<PencilSquareIcon />}
               onClick={() => {
                 setAcDateRange({
                   startDate: todayDate,
                   endDate: todayDate,
                 }); // Reset start date as today and end date as tomorrow for AC data
               }}
-            >
-              Reset
-            </Button>
+            />
           </div>
           <div className="col-span-2">
             <ACPlot acDateRange={acDateRange} />

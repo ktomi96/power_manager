@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { CircularProgress, Button, Typography, useTheme } from "@mui/material";
-import ContentLoader, { IContentLoaderProps } from "react-content-loader";
-import { JSX } from "react/jsx-runtime";
 import AcModeSelector, { AcModes } from "./components/AcModeSelector";
 import Slider from "./components/Slider";
 import ToggleSwitch from "./components/ToggleSwitch";
+import Button from "./components/Button";
+import Loader from "./components/Loader";
 
 interface ACApiResponse {
   mode: AcModes;
@@ -22,47 +21,6 @@ const AcSetter: React.FC = () => {
   const [AcTemperature, setAcTemperature] = useState<number>(20);
   const [isLoading, setIsLoading] = useState(true);
   const [isPosting, setIsPosting] = useState(false);
-
-  const MyLoader = (props: JSX.IntrinsicAttributes & IContentLoaderProps) => {
-    const theme = useTheme();
-    const classes = {
-      root: {
-        width: "100%",
-        height: "100%",
-      },
-      loader: {
-        [theme.breakpoints.down("sm")]: {
-          width: "80%", // Adjust this value for smaller devices
-        },
-        [theme.breakpoints.up("md")]: {
-          width: "100%",
-        },
-        [theme.breakpoints.up("lg")]: {
-          width: "60%", // Adjust this value for larger devices
-        },
-      },
-    };
-
-    return (
-      <ContentLoader
-        speed={1}
-        width={1180}
-        height={115}
-        viewBox="0 0 1180 115"
-        className={`${classes.root} ${classes.loader}`}
-        backgroundColor="#deddda"
-        foregroundColor="#ecebeb"
-        {...props}
-      >
-        <rect x="0" y="11" rx="0" ry="0" width="227" height="42" />
-        <rect x="141" y="103" rx="0" ry="0" width="1" height="0" />
-        <rect x="1" y="78" rx="0" ry="0" width="222" height="40" />
-        <rect x="255" y="33" rx="0" ry="0" width="218" height="5" />
-        <rect x="369" y="87" rx="0" ry="0" width="84" height="30" />
-        <circle cx="364" cy="37" r="9" />
-      </ContentLoader>
-    );
-  };
 
   useEffect(() => {
     axios
@@ -128,7 +86,7 @@ const AcSetter: React.FC = () => {
     >
       {isLoading ? (
         <div className="w-full grow">
-          <MyLoader />
+          <Loader />
         </div>
       ) : acSetterDisplay ? (
         <div className="flex flex-row flex-wrap">
@@ -161,32 +119,16 @@ const AcSetter: React.FC = () => {
           </div>
           <div className="w-1/2 text-end sm:text-left">
             <Button
-              variant="contained"
-              size="small"
               onClick={setAcApi}
               disabled={isPosting}
-              style={{ position: "relative" }}
-            >
-              {isPosting && (
-                <CircularProgress
-                  size={24}
-                  color="inherit"
-                  style={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    marginTop: -12,
-                    marginLeft: -12,
-                  }}
-                />
-              )}
-              {!isPosting ? "Set State" : "Posting"}
-            </Button>
+              text={isPosting ? "Posting" : "Set State"}
+              isLoading={isPosting}
+            />
           </div>
         </div>
       ) : (
-        <div className="flex grow">
-          <Typography>Error loading AC data</Typography>
+        <div className="flex grow w-full">
+          <div>Error loading AC data</div>
         </div>
       )}
     </div>
