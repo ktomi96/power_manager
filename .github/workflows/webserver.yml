@@ -32,6 +32,10 @@ jobs:
         working-directory: ./src/frontend/
         run: yarn set version berry
 
+      - name: Yarn init
+        working-directory: ./src/frontend/
+        run: yarn
+
       - name: Change directory and install dependencies
         working-directory: ./src/frontend/
         run: yarn install
