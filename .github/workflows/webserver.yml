@@ -42,7 +42,7 @@ jobs:
 
       - name: Change directory and install dependencies
         working-directory: ./src/frontend/
-        run: yarn install --force
+        run: yarn install --immutable
 
       - name: Linting
         working-directory: ./src/frontend/
