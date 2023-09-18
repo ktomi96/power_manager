@@ -1,64 +1,34 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import {
-  CircularProgress,
-  Grid,
-  Button,
-  Slider,
-  Switch,
-  Typography,
-  Stack,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
-  FormLabel,
-} from "@mui/material";
+import AcModeSelector, { AcModes } from "./components/AcModeSelector";
+import Slider from "./components/Slider";
+import ToggleSwitch from "./components/ToggleSwitch";
+import Button from "./components/Button";
+import Loader from "./components/Loader";
+
+interface ACApiResponse {
+  mode: AcModes;
+  running: boolean;
+  target_temperature: string;
+}
 
 const AcSetter: React.FC = () => {
   const acSetterDisplay = useRef(true);
-  const [AcModeValue, setAcModeValue] = useState<string>("auto_mode");
-
-  const handleAcModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAcModeValue(event.target.value);
-  };
+  const [AcModeValue, setAcModeValue] = useState<AcModes>(AcModes.auto);
 
   const [AcStateValue, setAcStateValue] = useState<boolean>(false);
-  const handleAcStateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAcStateValue(event.target.checked);
-  };
 
   const [AcTemperature, setAcTemperature] = useState<number>(20);
-  const handleAcTemperatureChange = (
-    event: React.SyntheticEvent | Event,
-    value: number | Array<number>
-  ) => {
-    setAcTemperature(value as number);
-  };
   const [isLoading, setIsLoading] = useState(true);
   const [isPosting, setIsPosting] = useState(false);
-
-  const marks = [
-    {
-      value: 20,
-      label: "20°C",
-    },
-    {
-      value: 30,
-      label: "30°C",
-    },
-  ];
-
-  function valuetext(value: number) {
-    return `${value}°C`;
-  }
 
   useEffect(() => {
     axios
       .get("/ac_status")
       .then((response) => {
-        const { mode, running, target_temperature } = response.data;
-        setAcModeValue(mode);
+        const { mode, running, target_temperature } =
+          response.data as ACApiResponse;
+        setAcModeValue(mode ?? AcModes.auto);
         setAcStateValue(running);
         setAcTemperature(parseInt(target_temperature));
         setIsLoading(false);
@@ -95,106 +65,73 @@ const AcSetter: React.FC = () => {
         console.log(error);
       });
   };
-
+  const marks = [
+    {
+      value: 20,
+      label: "20°C",
+    },
+    {
+      value: 25,
+      label: "25°C",
+    },
+    {
+      value: 30,
+      label: "30°C",
+    },
+  ];
   return (
-    <Grid
-      container
-      direction="row"
-      justifyContent="flex-start"
-      alignItems="flex-start"
-      spacing={2}
+    <div
+      className="grow
+    "
     >
       {isLoading ? (
-        <Grid item xs={12}>
-          <CircularProgress />
-        </Grid>
+        <div className="w-full grow">
+          <Loader />
+        </div>
       ) : acSetterDisplay ? (
-        <>
-          <Grid item xs={12} sm={6}>
-            <FormControl>
-              <FormLabel id="row-radio-buttons-group-label">AC mode</FormLabel>
-              <RadioGroup
-                row
-                aria-labelledby="row-radio-buttons-group-label"
-                name="row-radio-buttons-group"
-                value={AcModeValue}
-                onChange={handleAcModeChange}
-              >
-                <FormControlLabel
-                  value="heating_mode"
-                  control={<Radio />}
-                  label="Heating"
-                />
-                <FormControlLabel
-                  value="auto_mode"
-                  control={<Radio />}
-                  label="Auto"
-                />
-                <FormControlLabel
-                  value="cooling_mode"
-                  control={<Radio />}
-                  label="Cooling"
-                />
-              </RadioGroup>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6}>
+        <div className="flex flex-row flex-wrap">
+          <div className="w-full sm:w-1/3">
+            <div>
+              <AcModeSelector
+                defaultMode={AcModeValue}
+                onModeChange={setAcModeValue}
+              />
+            </div>
+          </div>
+          <div className="w-full sm:w-2/3">
             <Slider
-              aria-label="Custom marks"
-              defaultValue={20}
-              getAriaValueText={valuetext}
-              step={1}
-              valueLabelDisplay="auto"
-              marks={marks}
               min={20}
               max={30}
-              value={AcTemperature}
-              onChangeCommitted={handleAcTemperatureChange}
+              step={1}
+              marks={marks}
+              onValueChange={setAcTemperature}
             />
-          </Grid>
-          <Grid item xs={6}>
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Typography>Off</Typography>
-              <Switch
-                checked={AcStateValue}
-                onChange={handleAcStateChange}
-                color="success"
-                inputProps={{ "aria-label": "ant design" }}
+          </div>
+          <div className="w-1/2">
+            <div className="flex gap-2">
+              <div>Off</div>
+              <ToggleSwitch
+                defaultValue={AcStateValue}
+                onValueChange={setAcStateValue}
               />
-              <Typography>On</Typography>
-            </Stack>
-          </Grid>
-          <Grid item xs={6}>
+              <div>On</div>
+            </div>
+          </div>
+          <div className="w-1/2 text-end sm:text-left">
             <Button
-              variant="contained"
-              size="small"
               onClick={setAcApi}
               disabled={isPosting}
-              style={{ position: "relative" }}
-            >
-              {isPosting && (
-                <CircularProgress
-                  size={24}
-                  color="inherit"
-                  style={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    marginTop: -12,
-                    marginLeft: -12,
-                  }}
-                />
-              )}
-              {!isPosting ? "Set State" : "Posting"}
-            </Button>
-          </Grid>
-        </>
+              text={isPosting ? "Posting" : "Set State"}
+              isLoading={isPosting}
+            />
+          </div>
+        </div>
       ) : (
-        <Grid item xs={12}>
-          <Typography>Error loading AC data</Typography>
-        </Grid>
+        <div className="flex grow w-full">
+          <div>Error loading AC data</div>
+        </div>
       )}
-    </Grid>
+    </div>
   );
 };
 
