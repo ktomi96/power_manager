@@ -104,5 +104,5 @@
     "url": "^0.11.3",
     "webpack-merge": "^5.9.0"
   },
-  "packageManager": "yarn@3.6.0"
+  "packageManager": "yarn@3.6.3"
 }

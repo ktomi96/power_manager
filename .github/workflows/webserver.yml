@@ -31,10 +31,6 @@ jobs:
       - name: Yarn version Berry
         working-directory: ./src/frontend/
         run: yarn set version berry
-
-      - name: Delete Yarn Lockfile
-        working-directory: ./src/frontend/
-        run: rm yarn.lock
       
       - name: Check Yarn version
         working-directory: ./src/frontend/
