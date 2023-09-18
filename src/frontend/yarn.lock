@@ -5710,6 +5710,7 @@ __metadata:
     url: ^0.11.3
     util: ^0.12.5
     web-vitals: ^3.4.0
+    webpack: ^5.88.2
   languageName: unknown
   linkType: soft
 
@@ -16660,7 +16661,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.64.4":
+"webpack@npm:^5.64.4, webpack@npm:^5.88.2":
   version: 5.88.2
   resolution: "webpack@npm:5.88.2"
   dependencies:
