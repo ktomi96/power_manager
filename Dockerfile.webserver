@@ -1,6 +1,7 @@
 FROM python:slim-buster
 
 ENV PYTHONUNBUFFERED=true
+ENV NODE_MAJOR=20
 
 RUN apt update && \
     apt install --no-install-recommends -y && \
@@ -19,7 +20,6 @@ RUN   apt update && \
 ARG ENABLE_FRONTEND=false
 RUN if [ "$ENABLE_FRONTEND" = "true" ]; then \
       apt update && \
-      curl -fsSL https://deb.nodesource.com/setup_20.x | bash - &&\
       apt-get install -y nodejs && \
       corepack enable && \
       corepack prepare yarn@stable --activate && \
