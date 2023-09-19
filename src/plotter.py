@@ -146,6 +146,6 @@ def date_time_validator(dates: str):
 if __name__ == "__main__":
     # df = pd.concat(df_list, ignore_index=True)
     # ac_plot(df)
-    # path = "./logs/solar"
-    plot = ac_plotter(["2023-09-18", "2023-09-18"])
-    print(plot)
+    path = "./logs/solar"
+    # plot = ac_plotter(["2023-09-18", "2023-09-18"])
+    # print(plot)

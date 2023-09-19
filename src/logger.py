@@ -250,8 +250,6 @@ def main(
 
 if __name__ == "__main__":
     status_mem = {}
-    # main(ac_logger_trigger_value, solar_logger_triger_value, power_logger_trigger_value)
-    ac = AC(address=address, token=token, key=key)
+    main(ac_logger_trigger_value, solar_logger_triger_value, power_logger_trigger_value)
+    # ac = AC(address=address, token=token, key=key)
     # ac_logging(ac)
-    status = ac.ac_status()
-    print(status)
