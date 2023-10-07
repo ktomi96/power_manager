@@ -52,7 +52,7 @@ const AcSetter: React.FC = () => {
       .post("/ac_set", data)
       .then((response) => {
         if (response.status === 200) {
-          const { mode, running, target_temperature } = response.data;
+          const { mode, running, target_temperature } = response.data as ACApiResponse;
 
           setAcModeValue(mode);
           setAcStateValue(running);
@@ -104,6 +104,7 @@ const AcSetter: React.FC = () => {
               max={30}
               step={1}
               marks={marks}
+              defaultValue={AcTemperature}
               onValueChange={setAcTemperature}
             />
           </div>
