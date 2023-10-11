@@ -25,7 +25,7 @@ interface AcPlotProps {
 }
 
 const ACPlot: React.FC<AcPlotProps> = ({ acDateRange }) => {
-  const acJson = useChartData<ac>("/ac", acDateRange);
+  const acJson = useChartData<ac>("/ac_plot", acDateRange);
   const [currAcJson, setCurrAcJson] = useState<ac[] | null>(acJson);
 
   usePreviousEffect(
