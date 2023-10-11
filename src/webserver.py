@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 import os
-import sys
-import requests
-import glob
-from datetime import date, timedelta, datetime
+import logging
 
 from flask import (
     Flask,
@@ -14,7 +11,6 @@ from flask import (
     jsonify,
 )
 import dotenv
-import pandas as pd
 
 from forms import AC_login_setup
 from plotter import ac_plotter, solar_plotter, solar_produce_agr
@@ -25,8 +21,7 @@ env_path = "./env/"
 env_file = f"{env_path}.env"
 dotenv.find_dotenv(env_file, raise_error_if_not_found=True)
 
-logs_dir = ["ac", "solar"]
-
+log_level = os.environ.get("LOG_LEVEL", "INFO")
 logs_path = os.getenv("LOG_PATH")
 db_path = os.getenv("DB_PATH")
 db_url = f"{os.getenv('DB')}{db_path}"
@@ -40,6 +35,10 @@ app = Flask(
 
 SECRET_KEY = os.urandom(32)
 app.config["SECRET_KEY"] = SECRET_KEY
+
+
+logging.basicConfig(level=log_level)
+logger = logging.getLogger(__name__)
 
 
 def is_config():
@@ -70,7 +69,7 @@ def home():
     return app.send_static_file("index.html")
 
 
-@app.route("/ac", methods=["GET"])
+@app.get("/ac_plot")
 def get_ac_plot():
     start_date = request.args.get("start_date", default=None, type=str)
     end_date = request.args.get("end_date", default=None, type=str)
@@ -78,10 +77,11 @@ def get_ac_plot():
         return {"error": 404}
 
     ac_data = ac_plotter([start_date, end_date])
+    logging.debug("AC_DATA: %s", ac_data)
     return ac_data if ac_data is not None else jsonify(None)
 
 
-@app.route("/solar", methods=["GET"])
+@app.get("/solar")
 def get_solar_plot():
     start_date = request.args.get("start_date", default=None, type=str)
     end_date = request.args.get("end_date", default=None, type=str)
@@ -89,10 +89,11 @@ def get_solar_plot():
         return {"error": 404}
 
     solar_data = solar_plotter([start_date, end_date])
+    logging.debug("SOLAR_DATA: %s", solar_data)
     return solar_data if solar_data is not None else jsonify(None)
 
 
-@app.route("/solar_sum", methods=["GET"])
+@app.get("/solar_sum")
 def get_solar_agr():
     start_date = request.args.get("start_date", default=None, type=str)
     end_date = request.args.get("end_date", default=None, type=str)
@@ -100,12 +101,11 @@ def get_solar_agr():
         return {"error": 404}
 
     solar_data = int(solar_produce_agr([start_date, end_date]))
-    print(f"solar_sum: {solar_data}")
+    logging.debug("SOLAR_SUM: %s", solar_data)
     return jsonify(solar_data) if solar_data is not None else jsonify(None)
 
 
-
-@app.route("/ac_status", methods=["GET"])
+@app.get("/ac")
 def ac_status():
     try:
         ac_status = ac_status_getter()
@@ -114,24 +114,26 @@ def ac_status():
             if ac_status is not None
             else ({"error": "ac_status"}, 404)
         )
+        logging.debug("AC_STATUS: %s", ac_status)
     except Exception as esc:
-        print(esc, file=sys.stderr)
+        logging.warn("AC_STATUS: %s", esc)
 
 
-@app.route("/ac_set", methods=["POST"])
+@app.post("/ac")
 def ac_set():
     try:
         json_ac_settings = request.get_json()
         ac_settings = dict(json_ac_settings)
+        logging.debug("AC_SETTINGS: %s", ac_settings)
 
         state = ac_status_setter(ac_settings)
         if not state:
             response_data = {"error": "Bad request"}
             return jsonify(response_data), 400
-
+        logging.debug("AC_SET_STATUS: %s", state)
         return jsonify(state), 200
     except Exception as esc:
-        print(esc, file=sys.stderr)
+        logging.warn("AC_SETTER: %s", esc)
 
 
 @app.route("/setup", methods=["GET", "POST"])
@@ -149,7 +151,7 @@ def setup_page():
     return render_template("setup.html", form=ac_form)
 
 
-@app.route("/ping", methods=["GET"])
+@app.get("/ping")
 def is_webserver_running():
     return {"is_webserver_running": True}
 

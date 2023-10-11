@@ -5,4 +5,4 @@
 /src/frontend/node_modules/
 *.yml
 /src/frontend/.yarn/
-/app/src/frontend/.yarnrc.yml
+/src/frontend/.yarnrc.yml

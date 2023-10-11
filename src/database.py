@@ -4,20 +4,16 @@ import os
 
 from sqlalchemy import (
     create_engine,
-    ForeignKey,
     Column,
-    String,
     Integer,
     DateTime,
     Boolean,
     Float,
-    text,
-    select,
     func,
     inspect,
     exc,
 )
-from sqlalchemy.orm import sessionmaker, declarative_base, Session
+from sqlalchemy.orm import declarative_base, Session
 import pandas
 import dotenv
 import numpy

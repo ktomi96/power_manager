@@ -1,12 +1,11 @@
 try:
-    import contextlib
     from ac import AC
     from solar import SOLAR
     from power_meter import power_meter_logger
     from database import AC_LOG, SOLAR_LOG, append_to_db
     import dotenv
     import os
-    from datetime import datetime
+    from datetime import datetime, timedelta
 
     from apscheduler.schedulers.blocking import BlockingScheduler
     from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
@@ -160,7 +159,6 @@ def logger_schulder(*args, ac, solar, trigger_values_dict):
         print("Ctrl+C was pressed, shutdown down")
     except Exception as esc:
         print(f"Job failed with {esc}")
-        scheduler.add_job(func)
 
 
 def ac_logging(ac):  # sourcery skip: extract-duplicate-method

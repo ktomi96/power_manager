@@ -1,17 +1,9 @@
-# external imports
-from solaredge.api.client import Client
-from datetime import datetime, timedelta, date
-import numpy as np
 import math
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
-import time
-import zoneinfo
-import requests
-import pandas as pd
 import os
+from datetime import datetime, date
 
-# internal imports
+from solaredge.api.client import Client
+import requests
 
 
 # TODO read location from env variable
@@ -69,7 +61,6 @@ class SOLAR(object):
         power_balance = math.fsum(y)
         prod_time = (num_prod_time * 15) / 60
         daytime = self.get_daytime()
-        today_str = date.today().strftime("%Y-%m-%d")
 
         return {
             "power_generated": round(power_balance, 2),
@@ -84,7 +75,7 @@ if __name__ == "__main__":
     import dotenv
     import re
 
-    from database import AC_LOG, SOLAR_LOG, append_to_db
+    from database import SOLAR_LOG, append_to_db
 
     dotenv.load_dotenv("./env/.env")
     location_id = os.getenv("LOCATION_ID")
