@@ -3,16 +3,10 @@ import os
 import dotenv
 import pandas
 from datetime import date, datetime, timedelta
-from sqlalchemy.exc import OperationalError
 
-from mvm_smart_meter import get_load_curve, get_all_load_curve, sum_load_curve
+from mvm_smart_meter import get_load_curve, get_all_load_curve
 from database import (
-    POWER_METER,
-    POWER_METER_AGGREGATE,
-    append_to_db,
-    query_last_row,
     df_to_db,
-    is_table_exists,
     power_meter_last_entry,
 )
 
