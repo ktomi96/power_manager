@@ -105,7 +105,7 @@ def get_solar_agr():
 
 
 
-@app.route("/ac_status", methods=["GET"])
+@app.route("/ac", methods=["GET"])
 def ac_status():
     try:
         ac_status = ac_status_getter()
@@ -118,7 +118,7 @@ def ac_status():
         print(esc, file=sys.stderr)
 
 
-@app.route("/ac_set", methods=["POST"])
+@app.route("/ac", methods=["POST"])
 def ac_set():
     try:
         json_ac_settings = request.get_json()

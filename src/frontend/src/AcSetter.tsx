@@ -24,7 +24,7 @@ const AcSetter: React.FC = () => {
 
   useEffect(() => {
     axios
-      .get("/ac_status")
+      .get("/ac")
       .then((response) => {
         const { mode, running, target_temperature } =
           response.data as ACApiResponse;
@@ -49,7 +49,7 @@ const AcSetter: React.FC = () => {
     };
 
     axios
-      .post("/ac_set", data)
+      .post("/ac", data)
       .then((response) => {
         if (response.status === 200) {
           const { mode, running, target_temperature } = response.data as ACApiResponse;
