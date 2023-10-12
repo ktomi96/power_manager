@@ -11,6 +11,8 @@ from flask import (
     jsonify,
 )
 import dotenv
+from flask_caching import Cache
+
 
 from forms import AC_login_setup
 from plotter import ac_plotter, solar_plotter, solar_produce_agr
@@ -27,11 +29,20 @@ db_path = os.getenv("DB_PATH")
 db_url = f"{os.getenv('DB')}{db_path}"
 debug = os.getenv("DEBUG") == "True"
 
+config = {
+    "DEBUG": True,  # some Flask specific configs
+    "CACHE_TYPE": "SimpleCache",  # Flask-Caching related configs
+    "CACHE_DEFAULT_TIMEOUT": 300,
+}
+
 app = Flask(
     __name__,
     static_folder="../src/frontend/build/",
     static_url_path="/",
 )
+
+app.config.from_mapping(config)
+cache = Cache(app)
 
 SECRET_KEY = os.urandom(32)
 app.config["SECRET_KEY"] = SECRET_KEY
@@ -65,6 +76,7 @@ def set_dotenv_ac(request):
 
 
 @app.route("/")
+@cache.cached(timeout=30)
 def home():
     return app.send_static_file("index.html")
 
@@ -106,6 +118,7 @@ def get_solar_agr():
 
 
 @app.get("/ac")
+@cache.cached(timeout=30)
 def ac_status():
     try:
         ac_status = ac_status_getter()

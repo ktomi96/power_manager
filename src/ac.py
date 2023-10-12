@@ -3,8 +3,6 @@ import dotenv
 
 from midea_beautiful import appliance_state
 
-from pprint import pprint
-
 
 class AC(object):
     def __init__(self, address: str, token: str, key: str):
@@ -73,7 +71,6 @@ class AC(object):
         """
         status = self.get_status()
         status.set_state(**kwargs)
-        pprint(status)
 
     def set_temperature(self, temp: float):
         """
