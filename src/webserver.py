@@ -76,7 +76,6 @@ def set_dotenv_ac(request):
 
 
 @app.route("/")
-@cache.cached(timeout=30)
 def home():
     return app.send_static_file("index.html")
 
